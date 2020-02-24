@@ -23,7 +23,7 @@ for file in os.listdir(Folder_Path):
 with open(README_path, 'w', encoding='utf-8') as ReadMe_F:
     print(file_head, file=ReadMe_F)
     for x in python_file:
-        print(x, file=ReadMe_F)
+        print(x, '  ', file=ReadMe_F)
 file_num = len(python_file)
 print()
 print(f'以上文件均已写入README.md文件中，共{file_num}个！')
