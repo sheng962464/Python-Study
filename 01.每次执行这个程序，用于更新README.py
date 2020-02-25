@@ -22,6 +22,7 @@ for file in os.listdir(Folder_Path):
 
 with open(README_path, 'w', encoding='utf-8') as ReadMe_F:
     print(file_head, file=ReadMe_F)
+    print(f'### 共{len(python_file)}个文件', file=ReadMe_F)
     for x in python_file:
         print(x, '  ', file=ReadMe_F)           # 加俩空格，md文件才能显示换行
 file_num = len(python_file)
