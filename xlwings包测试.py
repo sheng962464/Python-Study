@@ -18,11 +18,11 @@ try:
     with open(error_code_text_path, 'w', encoding='utf-8') as f:
         print('# Python异常代码含义对照表', file=f)
         # 打印表头
-        print(f'|{Sheet0_Head[0]}|{Sheet0_Head[1]}|', file=f)
-        print('|:----|:----|', file=f)
+        print(f'|序号|{Sheet0_Head[0]}|{Sheet0_Head[1]}|', file=f)
+        print('|:----|:----|:----|', file=f)
         # 打印内容
-        for x in Sheet0_List:
-            print(f'|{x[0]}|   {x[1]}|', file=f)
+        for i, x in enumerate(Sheet0_List):
+            print(f'|{i}|{x[0]}|{x[1]}|', file=f)
 
     print(f'共{sheet0_row}行,{sheet0_column}列,输入结束')
 finally:
