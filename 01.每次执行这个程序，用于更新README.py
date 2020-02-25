@@ -16,7 +16,7 @@ print('当前目录下的如下：')
 python_file = []
 
 for file in os.listdir(Folder_Path):
-    if os.path.splitext(file)[1] == '.py':
+    if file.endswith(('.py', '.md')) and file != README_path:
         python_file.append(file)
         print(file)
 
