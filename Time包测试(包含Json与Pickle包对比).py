@@ -116,24 +116,20 @@ print()
 print('用json包转换：')
 p_str_json = json.dumps(Data)
 print(p_str_json, type(p_str_json))
-
 mes_json = json.loads(p_str_json)
 print(mes_json, type(mes_json))
-
 print('json只能实现字符串和python内置结构的转换')
 print()
 
 print('用pickle包转换:')
 p_str_pickle = pickle.dumps(Data)
 print(p_str_pickle, type(p_str_pickle))
-
 mes_pickle = pickle.loads(p_str_pickle)
 print(mes_pickle, type(mes_pickle))
-
 print('pickle能实现自定义类的保存')
 print()
 
-
+# strftime和strptime相互对应
 formatTime = time.strftime('%Y-%m-%d %H:%M:%S', Data)
 print('格式化字符串:', formatTime)
 print()
@@ -148,5 +144,4 @@ print()
 
 print(time.asctime())
 print(time.ctime())
-print()
 

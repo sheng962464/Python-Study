@@ -140,8 +140,10 @@ test = ["I", "Like", "Python"]
 print(test)
 print(" ".join(test))  # 前面的' '表示字符串中间的分隔符
 
-# 15. 翻转字符串、列表
-pass
+# 15. 翻转字符串、列表(切片方法)
+orgin_str = 'pythontab.com'
+print(orgin_str[::-1])
+print(list(reversed(orgin_str)))
 
 # 16. 用枚举在循环中找到索引
 test = [10, 20, 30]
