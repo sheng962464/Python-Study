@@ -53,7 +53,10 @@ def is_rotate_matrix(x_matrix):
     旋转矩阵为正交矩阵，正交矩阵与正交矩阵的逆的乘积为单位矩阵，行列式的值为1
     """
     matrix = np.array(x_matrix)
-    pass
+    if abs(1 - np.linalg.det(np.dot(matrix, matrix.T))) < 1e-6:
+        return True
+    else:
+        return False
 
 
 def matrix_to_euler_angle(x_matrix):
@@ -71,8 +74,4 @@ def test_unit():
 if __name__ == '__main__':
     print('################################')
     test_matrix = euler_angle_to_matrix([10.0, 10.0, 10.0])
-    print('旋转矩阵：\n',test_matrix)
-    temp = test_matrix.T
-    print('旋转矩阵的转置：\n',temp)
-    print('旋转矩阵与转置的乘法：\n',np.dot(test_matrix, temp))
-    print('乘法的行列式：',np.linalg.det(np.dot(test_matrix, temp)))
+    print(is_rotate_matrix(test_matrix))
