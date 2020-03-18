@@ -12,5 +12,6 @@ b = np.array([[11, 12], [13, 14]])
 # 矩阵乘法
 print(np.dot(a, b))
 
-ax, ay, az = np.array([1, 2, 3])
-print(ax, ay, az)
+
+data = np.arange(10).reshape(2,5)
+print(data.T)
