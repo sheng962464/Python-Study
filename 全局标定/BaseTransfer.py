@@ -1,4 +1,5 @@
 import numpy as np
+import numpy.matlib
 
 
 def Rodrigues(x_vector):
@@ -44,13 +45,15 @@ def euler_angle_to_matrix(x_euler_angle):
     my = np.array([[np.cos(ay), 0, np.sin(ay)], [0, 1, 0], [-np.sin(ay), 0, np.cos(ay)]])
     mz = np.array([[np.cos(az), -np.sin(az), 0], [np.sin(az), np.cos(az), 0], [0, 0, 1]])
 
-    return np.dot(np.dot(mx,my),mz)
+    return np.dot(mz, np.dot(my, mx))
 
 
 def is_rotate_matrix(x_matrix):
+    """
+    旋转矩阵为正交矩阵，正交矩阵与正交矩阵的逆的乘积为单位矩阵，行列式的值为1
+    """
     matrix = np.array(x_matrix)
-    temp = matrix * matrix.T
-    print(np.linalg.det(temp))
+    pass
 
 
 def matrix_to_euler_angle(x_matrix):
@@ -62,21 +65,14 @@ def matrix_to_euler_angle(x_matrix):
 
 
 def test_unit():
-    # 测试euler_angle_to_matrix()
-    m_matrix = euler_angle_to_matrix([1, 1, 1])
-    print(m_matrix)
-    print('################################')
-    # 测试is_rotate_matrix()
-    is_rotate_matrix(m_matrix)
+    pass
 
 
 if __name__ == '__main__':
-    # test_unit()
     print('################################')
-    test_matrix = euler_angle_to_matrix([1, 1, 1])
-    # print(np.linalg.inv(np.array(test_matrix)))
-    is_rotate_matrix(test_matrix)
-
-
-
-
+    test_matrix = euler_angle_to_matrix([10.0, 10.0, 10.0])
+    print('旋转矩阵：\n',test_matrix)
+    temp = test_matrix.T
+    print('旋转矩阵的转置：\n',temp)
+    print('旋转矩阵与转置的乘法：\n',np.dot(test_matrix, temp))
+    print('乘法的行列式：',np.linalg.det(np.dot(test_matrix, temp)))
