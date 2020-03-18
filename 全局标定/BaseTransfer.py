@@ -68,10 +68,11 @@ def matrix_to_euler_angle(x_matrix):
 
 
 def test_unit():
-    pass
+    test_matrix = euler_angle_to_matrix([10.0, 10.0, 10.0])
+    print('测试-旋转矩阵为：',test_matrix)
+    print('测试-判断是否为旋转矩阵：',is_rotate_matrix(test_matrix))
 
 
 if __name__ == '__main__':
-    print('################################')
-    test_matrix = euler_angle_to_matrix([10.0, 10.0, 10.0])
-    print(is_rotate_matrix(test_matrix))
+    pass
+
