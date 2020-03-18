@@ -2,6 +2,15 @@
   <dictionary name="18320">
     <words>
       <w>dest</w>
+      <w>xdirection</w>
+      <w>xfixangle</w>
+      <w>xline</w>
+      <w>xorigin</w>
+      <w>xplane</w>
+      <w>xpoint</w>
+      <w>xpointnum</w>
+      <w>xtemp</w>
+      <w>xvector</w>
     </words>
   </dictionary>
 </component>
