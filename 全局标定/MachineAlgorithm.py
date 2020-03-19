@@ -11,7 +11,13 @@ def sensor_scan(x_sensor, x_travel, x_object):
 
 
 def test_unit():
-    m_sensor = BaseClass.sensor()
+    m_sensor = BaseClass.sensor(x_location=(0, 0, 1))
+    m_sensor.sensor_init()
+    path = [[0, i * 0.1, 10] for i in range(-10, 10)]
+    for xpath in path:
+        m_sensor.sensor_absolute_move(xpath)
+        for x in m_sensor.trigPoint:
+            xline = BaseClass.line(x, m_sensor.__laser_vector)
 
 
 if __name__ == '__main__':

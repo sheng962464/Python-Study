@@ -92,23 +92,42 @@ class plane:
 
 class sensor:
     """
+    传感器的本质为射线的集合
     点数，点间隔，安装角度，安装位置
     """
 
     def __init__(self, x_point_num=1500, x_point_interval=0.001, x_fix_angle=(0, 0, 0), x_location=(0, 0, 0)):
-        self.pointNum = x_point_num
-        self.pointInterval = x_point_interval
-        self.fixAngle = x_fix_angle
-        self.location = x_location
-        self.laser_vector = [0, 0, -1]
+        self.__pointNum = x_point_num
+        self.__pointInterval = x_point_interval
+        self.__fixAngle = x_fix_angle
+        self.__location = np.array(x_location)
+        self.__laser_vector = [0, 0, -1]
 
-        self.trigPoint = (i * self.pointInterval for i in range(-x_point_num // 2, x_point_num // 2 + 1))
+        self.laser = None
+        self.sensor_calculation()
 
-    def sensor_init(self):
-        self.laser_vector = np.dot(BaseTransfer.euler_angle_to_matrix(self.fixAngle), np.array(self.laser_vector))
+    def sensor_calculation(self):
+        self.__laser_vector = np.dot(BaseTransfer.euler_angle_to_matrix(self.__fixAngle), np.array(self.__laser_vector))
+        temp_trig_point = [self.__location + np.array([i * self.__pointInterval, 0, 0])
+                           for i in range(-self.__pointNum // 2, self.__pointNum // 2)]
+        self.laser = [line(xorigin=point(*x), xdirection=point(*self.__laser_vector)) for x in temp_trig_point]
+
+    def sensor_absolute_move(self, x_location):
+        # 绝对移动
+        self.__location = x_location
+        self.sensor_calculation()
+        print(f'移动到{self.__location}位置')
+
+    def sensor_relative_move(self):
+        pass
 
     def save(self):
         pass
+
+    def __str__(self):
+        for x in self.laser:
+            print(x)
+        return f'传感器输出结束,共{len(self.laser)}条激光线'
 
 
 class model:
@@ -320,7 +339,7 @@ def test_unit():
     save_folder = r"D:\全局标定测试"
 
     # # region 测试point类
-    # m_point = point()
+    # m_point = point(*[1, 2, 3])
     # print('测试print函数：', m_point)
     # print('测试点加法：', m_point + point(1, 1, 1))
     # print('测试点减法：', m_point - point(1, 1, 1))
@@ -339,17 +358,16 @@ def test_unit():
     # print('测试print函数：', m_plane)
     # # endregion 测试plane类
 
-    # # region 测试sensor类
-    # m_sensor = sensor(x_fix_angle=(1, 1, 1))
-    # print(m_sensor.laser_vector)
-    # m_sensor.sensor_init()
-    # print(m_sensor.laser_vector)
-    # # endregion
-
-    # region 测试STL类
-    m_stl_model = STLModel.read_stl(r'D:\全局标定测试\T项目下表面.stl')
-    print(m_stl_model)
+    # region 测试sensor类
+    m_sensor = sensor(x_fix_angle=(0, 0, 1))
+    m_sensor.sensor_absolute_move([0, 1, 1])
+    print(m_sensor)
     # endregion
+
+    # # region 测试STL类
+    # m_stl_model = STLModel.read_stl(r'D:\全局标定测试\T项目下表面.stl')
+    # print(m_stl_model)
+    # # endregion
 
 
 if __name__ == '__main__':
