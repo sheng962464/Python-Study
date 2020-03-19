@@ -29,4 +29,8 @@ def test_unit():
 
 
 if __name__ == '__main__':
+    import time
+    start_time = time.time()
     test_unit()
+    end_time = time.time()
+    print(f'耗时{end_time-start_time}s')
