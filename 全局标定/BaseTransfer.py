@@ -40,7 +40,7 @@ def Rodrigues(x_vector):
 
 def euler_angle_to_matrix(x_euler_angle):
     """
-    欧拉角转换为旋转矩阵
+    欧拉角（单位：度）转换为旋转矩阵
     """
     assert len(x_euler_angle) == 3
     euler_angle = np.array(x_euler_angle)
