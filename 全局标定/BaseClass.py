@@ -121,8 +121,10 @@ class sensor:
     def sensor_relative_move(self):
         pass
 
-    def save(self):
-        pass
+    def save(self, x_path):
+        with open(x_path, 'w') as f:
+            for x in self.laser:
+                print(x, file=f)
 
     def __str__(self):
         for x in self.laser:
@@ -362,6 +364,8 @@ def test_unit():
     m_sensor = sensor(x_fix_angle=(0, 0, 1))
     m_sensor.sensor_absolute_move([0, 1, 1])
     print(m_sensor)
+    save_point_path = os.path.join(save_folder, 'sensor.txt')
+    m_sensor.save(save_point_path)
     # endregion
 
     # # region 测试STL类
