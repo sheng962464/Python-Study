@@ -42,8 +42,19 @@ class point:
         assert isinstance(other, point)
         return point(self.__x - other.__x, self.__y - other.__y, self.__z - other.__z)
 
+    def __mul__(self, other):
+        assert isinstance(other, (int, float))
+        return point(self.__x * other, self.__y * other, self.__z * other)
+
+    def __truediv__(self, other):
+        assert isinstance(other, (int, float)) and other
+        return point(self.__x / other, self.__y / other, self.__z / other)
+
     def __str__(self):
         return f'({self.__x},{self.__y},{self.__z})'
+
+    def __len__(self):
+        return len(self.to_array())
 
     def save(self, x_file_path):
         with open(x_file_path, 'w') as x_file:
@@ -51,6 +62,19 @@ class point:
 
     def to_array(self):
         return np.array([self.__x, self.__y, self.__z])
+
+    def to_norm(self):
+        """
+        计算 (x,y,z) / sqrt(x*x + y*y + z*z)
+        """
+        point_array = self / self.norm()
+        return point_array
+
+    def norm(self):
+        """
+        计算 sqrt(x*x + y*y + z*z)
+        """
+        return np.linalg.norm(self.to_array())
 
 
 class line:
@@ -68,6 +92,12 @@ class line:
 
     def __str__(self):
         return f'origin:{self.origin},direction:{self.direction}'
+
+    def get_point_from_t(self, x_t):
+        """
+        根据参数值，获取直线上的点
+        """
+        return self.origin + self.direction * x_t
 
     def save(self):
         pass
@@ -175,10 +205,7 @@ class triangle:
         """
         计算三角形的质心，三个点的平均值
         """
-        centroid_x = (self.__vertex1.x + self.__vertex2.x + self.__vertex3.x) / 3
-        centroid_y = (self.__vertex1.y + self.__vertex2.y + self.__vertex3.y) / 3
-        centroid_z = (self.__vertex1.z + self.__vertex2.z + self.__vertex3.z) / 3
-        return point(centroid_x, centroid_y, centroid_z)
+        return (self.__vertex1 + self.__vertex2 + self.__vertex3) / 3
 
     def area(self):
         # 向量AB
@@ -337,18 +364,21 @@ class STLModel:
 
 
 def test_unit():
+    pass
+
     import os
     save_folder = r"D:\全局标定测试"
 
-    # # region 测试point类
-    # m_point = point(*[1, 2, 3])
-    # print('测试print函数：', m_point)
-    # print('测试点加法：', m_point + point(1, 1, 1))
-    # print('测试点减法：', m_point - point(1, 1, 1))
-    # save_point_path = os.path.join(save_folder, 'point.txt')
-    # m_point.save(save_point_path)
-    # print(f'测试点保存：{save_point_path}')
-    # # endregion 测试point类
+    # region 测试point类
+    m_point = point(*[0, 2, 0])
+    print('测试print函数：', m_point)
+    print('测试点加法：', m_point + point(1, 1, 1))
+    print('测试点减法：', m_point - point(1, 1, 1))
+    save_point_path = os.path.join(save_folder, 'point.txt')
+    m_point.save(save_point_path)
+    print(f'测试点保存：{save_point_path}')
+    print('测试点归一化:', m_point.to_norm())
+    # endregion 测试point类
 
     # # region 测试line类
     # m_line = line()
@@ -360,13 +390,13 @@ def test_unit():
     # print('测试print函数：', m_plane)
     # # endregion 测试plane类
 
-    # region 测试sensor类
-    m_sensor = sensor(x_fix_angle=(0, 0, 1))
-    m_sensor.sensor_absolute_move([0, 1, 1])
-    print(m_sensor)
-    save_point_path = os.path.join(save_folder, 'sensor.txt')
-    m_sensor.save(save_point_path)
-    # endregion
+    # # region 测试sensor类
+    # m_sensor = sensor(x_fix_angle=(0, 0, 1))
+    # m_sensor.sensor_absolute_move([0, 1, 1])
+    # print(m_sensor)
+    # save_point_path = os.path.join(save_folder, 'sensor.txt')
+    # m_sensor.save(save_point_path)
+    # # endregion
 
     # # region 测试STL类
     # m_stl_model = STLModel.read_stl(r'D:\全局标定测试\T项目下表面.stl')
