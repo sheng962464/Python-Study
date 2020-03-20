@@ -90,6 +90,16 @@ def get_rotate_matrix_from_two_vector(x_vector_old, x_vector_new):
     x_axis = cross_multip(x_vector_old, x_vector_new)
     return BaseTransfer.Rodrigues((x_axis * x_theta).to_array())
 
+def intersection_of_line_and_triangle():
+    """
+    先把直线的方向向量转到(0,0,-1),计算该旋转矩阵，为axis_to_z_matrix
+    axis_to_z_matrix * model = temp_model
+    判断直线与三角面片的交点(Z向投影)
+    计算axis_to_z_matrix的逆矩阵，z_to_axis_matrix
+
+    """
+    pass
+
 
 def test_unit():
     # # region 测试point_rotate()
