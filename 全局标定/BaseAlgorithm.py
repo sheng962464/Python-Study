@@ -99,6 +99,7 @@ def intersection_of_line_and_triangle():
 
     """
     pass
+    pass
 
 
 def test_unit():
