@@ -36,11 +36,11 @@ class point:
 
     def __add__(self, other):
         assert isinstance(other, point)
-        return point(self.__x + other.__x, self.__y + other.__y, self.__z + other.__y)
+        return point(self.__x + other.__x, self.__y + other.__y, self.__z + other.__z)
 
     def __sub__(self, other):
         assert isinstance(other, point)
-        return point(self.__x - other.__x, self.__y - other.__y, self.__z - other.__y)
+        return point(self.__x - other.__x, self.__y - other.__y, self.__z - other.__z)
 
     def __str__(self):
         return f'({self.__x},{self.__y},{self.__z})'

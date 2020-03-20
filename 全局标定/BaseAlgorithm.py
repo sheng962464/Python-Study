@@ -51,18 +51,20 @@ def create_plane_from_3point(xpoint1, xpoint2, xpoint3):
     return plane(xpoint1, point(a, b, c))
 
 
-def point_rotate(x_point, x_matrix, x_center=None):
+def point_rotate(x_point, x_matrix, x_center=point(0, 0, 0)):
     """
     既是点的旋转，又是向量的旋转
     """
-    pass
+    assert isinstance(x_point, point) and isinstance(x_matrix, np.ndarray) and isinstance(x_center,point)
+    new_point_array = np.dot(x_matrix, (x_point - x_center).to_array()) + x_center.to_array()
+    return point(*new_point_array)
 
 
-def line_rotate(x_line, x_matrix, x_center=None):
+def line_rotate(x_line, x_matrix, x_center=point(0, 0, 0)):
     """
     直线起始点绕旋转中心旋转，直线方向向量绕原点旋转
     """
-    assert isinstance(x_line, line) and isinstance(x_center, point)
+    assert isinstance(x_line, line) and isinstance(x_matrix, np.ndarray) and isinstance(x_center, point)
     new_line_origin = point_rotate(x_line.origin, x_matrix, x_center)
     new_line_direction = point_rotate(x_line.direction, x_matrix)
     return line(new_line_origin, new_line_direction)
@@ -73,9 +75,34 @@ def plane_rotate(x_plane, x_matrix, x_center=None):
     面起始点绕旋转中心旋转，直线方向向量绕原点旋转
     """
     assert isinstance(x_plane, plane) and isinstance(x_center, point)
-    new_plane_origin = point_rotate(x_line.origin, x_matrix, x_center)
+    new_plane_origin = point_rotate(x_plane.origin, x_matrix, x_center)
     new_plane_vector = point_rotate(x_plane.vector, x_matrix)
+    return plane(new_plane_origin,new_plane_vector)
+
+
+def test_unit():
+    # # region 测试point_rotate()
+    # old_point = point(0, 1, 1)
+    # m_matrix = BaseTransfer.euler_angle_to_matrix((-90, 0, 0))
+    # new_point = point_rotate(old_point, m_matrix,point(0,1,0))
+    # print(new_point)
+    # # endregion
+
+    # # region 测试line_rotate()
+    # old_line = line(xorigin=point(0,0,1),xdirection=point(0,0,1))
+    # m_matrix = BaseTransfer.euler_angle_to_matrix((-90, 0, 0))
+    # new_line = line_rotate(old_line,m_matrix,point(0,0,1))
+    # print(new_line)
+    # # endregion
+
+    # region 测试plane_rotate()
+    old_plane = plane(point(0,1,0),point(0,0,1))
+    m_matrix = BaseTransfer.euler_angle_to_matrix((-90, 0, 0))
+    new_plane = plane_rotate(old_plane,m_matrix,point(0,0,0))
+    print(new_plane)
+    # endregion
+    pass
 
 
 if __name__ == '__main__':
-    print(point())
+    test_unit()
