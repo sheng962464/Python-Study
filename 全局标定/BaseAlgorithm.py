@@ -211,6 +211,42 @@ def intersection_of_line_and_triangle_slice(x_line, x_triangle_slice):
         return None
 
 
+def get_highest_point_of_triangle_slice(x_triangle_slice):
+    """
+    返回三角面片的最高点
+    """
+    assert isinstance(x_triangle_slice, triangle_slice)
+
+    if x_triangle_slice.vertex.vertex1.z > x_triangle_slice.vertex.vertex2.z and \
+            x_triangle_slice.vertex.vertex1.z > x_triangle_slice.vertex.vertex3.z:
+        return x_triangle_slice.vertex.vertex1
+
+    if x_triangle_slice.vertex.vertex2.z > x_triangle_slice.vertex.vertex1.z and \
+            x_triangle_slice.vertex.vertex2.z > x_triangle_slice.vertex.vertex3.z:
+        return x_triangle_slice.vertex.vertex2
+
+    if x_triangle_slice.vertex.vertex3.z > x_triangle_slice.vertex.vertex1.z and \
+            x_triangle_slice.vertex.vertex3.z > x_triangle_slice.vertex.vertex2.z:
+        return x_triangle_slice.vertex.vertex3
+
+
+def get_part_triangle_slice(x_point, x_model, t):
+    assert isinstance(x_point, point) and isinstance(x_model, STLModel)
+    slice_list = []
+    min_x = x_point.x - t
+    max_x = x_point.x + t
+    min_y = x_point.y - t
+    max_y = x_point.y + t
+    for x in x_model:
+        assert isinstance(x, triangle_slice)
+        if x.vertex.vertex1.x > min_x:
+            if x.vertex.vertex1.x < max_x:
+                if x.vertex.vertex1.y > min_y:
+                    if x.vertex.vertex1.y < max_y:
+                        slice_list.append(x)
+    return slice_list
+
+
 def test_unit():
     # # region 测试point_rotate()
     # old_point = point(0, 1, 1)
@@ -256,21 +292,21 @@ def test_unit():
     # print(is_point_in_triangle_2D(m_point_2D, m_triangle_2D))
     # # endregion
 
-    # region 测试intersection_of_line_and_model
-    m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型0221.stl')
-    print('stl读取结束')
-    list_intersection = []
-    for i in range(0, 10):
-        print(i)
-        m_line = line(xorigin=point(-2, i, 20), xdirection=point(0, 0, -1))
-        temp = intersection_of_line_and_model(m_line, m_model)
-        if temp:
-            list_intersection.append(temp)
-    m_path = r'D:\全局标定测试\result.txt'
-    with open(m_path, 'w') as f:
-        for x in list_intersection:
-            print(f'{x.x},{x.y},{x.z}\n', file=f)
-    # endregion
+    # # region 测试intersection_of_line_and_model
+    # m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型0221.stl')
+    # print('stl读取结束')
+    # list_intersection = []
+    # for i in range(0, 10):
+    #     print(i)
+    #     m_line = line(xorigin=point(-2, i, 20), xdirection=point(0, 0, -1))
+    #     temp = intersection_of_line_and_model(m_line, m_model)
+    #     if temp:
+    #         list_intersection.append(temp)
+    # m_path = r'D:\全局标定测试\result.txt'
+    # with open(m_path, 'w') as f:
+    #     for x in list_intersection:
+    #         print(f'{x.x},{x.y},{x.z}\n', file=f)
+    # # endregion
 
     # # region 测试intersection_of_line_and_triangle_slice
     # m_line = line(xorigin=point(1, 1, 100), xdirection=point(0, 0, -1))
@@ -285,6 +321,27 @@ def test_unit():
     # n_model = model_rotate(m_model, m_matrix)
     # n_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
     # # endregion
+
+    corner_list = [
+        [-35.91, 64.23, 5, 0],
+        [- 35.89, 66.63, 5, 0],
+        [- 35.81, 69.03, 5, 0],
+        [- 35.54, 71.43, 5, -10],
+        [- 34.77, 73.83, 5, -45],
+        [- 33.6, 75.42, 5, -60],
+        [- 31.2, 77.07, 5, -80],
+        [- 28.8, 77.78, 5, 0],
+        [- 26.4, 78.06, 5, 0],
+        [- 24, 78.14, 5, 0],
+    ]
+    import time
+    test_point = point(33, -75, 5)
+    start_time = time.time()
+    m_model = STLModel.read_stl(r'D:\全局标定测试\Mesh.stl')
+    end_time = time.time()
+    print(end_time - start_time)
+    triangle_list = get_part_triangle_slice(test_point, m_model, 2)
+    print(len(triangle_list))
     pass
 
 
