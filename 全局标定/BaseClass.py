@@ -396,6 +396,10 @@ class triangle_slice:
 
 
 class STLModel:
+    """
+    STL模型类
+    可以增加一个STL法向量修复的函数，因为模型的法向量可能会出错
+    """
     def __init__(self, x_tri_list):
         """
         STL模型初始化
@@ -490,14 +494,15 @@ class STLModel:
         with open(x_path, 'w') as f:
             print('solid Mesh', file=f)
             for x in self.__tri_list:
-                print(f'facet normal {x.facet.x} {x.facet.y} {x.facet.z}', file=f)
+                print(f'facet normal {x.facet.x:.6e} {x.facet.y:.6e} {x.facet.z:.6e}', file=f)
                 print(f'outer loop', file=f)
-                print(f'vertex {x.vertex.vertex1.x} {x.vertex.vertex1.y} {x.vertex.vertex1.z}', file=f)
-                print(f'vertex {x.vertex.vertex2.x} {x.vertex.vertex2.y} {x.vertex.vertex2.z}', file=f)
-                print(f'vertex {x.vertex.vertex3.x} {x.vertex.vertex3.y} {x.vertex.vertex3.z}', file=f)
+                print(f'vertex {x.vertex.vertex1.x:.6e} {x.vertex.vertex1.y:.6e} {x.vertex.vertex1.z:.6e}', file=f)
+                print(f'vertex {x.vertex.vertex2.x:.6e} {x.vertex.vertex2.y:.6e} {x.vertex.vertex2.z:.6e}', file=f)
+                print(f'vertex {x.vertex.vertex3.x:.6e} {x.vertex.vertex3.y:.6e} {x.vertex.vertex3.z:.6e}', file=f)
                 print(f'endloop', file=f)
                 print(f'endfacet', file=f)
-        print('保存结束')
+            print('endsolid Mesh', file=f)
+        print('STL文件保存结束：成功')
         return
 
 
