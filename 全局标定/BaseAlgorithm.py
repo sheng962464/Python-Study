@@ -1,10 +1,11 @@
 from BaseClass import *
 import numpy as np
+import time
 
 epsilon = 1e-6
 
 
-def cross_multip(x_point1, x_point2):
+def cross_multiply(x_point1, x_point2):
     """
     | i j k |
 　　|a1 b1 c1|
@@ -19,7 +20,7 @@ def cross_multip(x_point1, x_point2):
     return point(b1 * c2 - b2 * c1, c1 * a2 - a1 * c2, a1 * b2 - a2 * b1).to_norm()
 
 
-def cross_multip_2D(x_point1, x_point2):
+def cross_multiply_2D(x_point1, x_point2):
     """
     | i j k |
 　　|a1 b1 c1|
@@ -34,7 +35,7 @@ def cross_multip_2D(x_point1, x_point2):
     return x1 * y2 - x2 * y1
 
 
-def dot_multip(x_point1, x_point2):
+def dot_multiply(x_point1, x_point2):
     """
     (a1,b1,c1) * (a2,b2,c2) = a1a2 + b1b2 + c1c2
     点乘的几何意义是可以用来表征或计算两个向量之间的夹角,以及在b向量在a向量方向上的投影
@@ -51,8 +52,9 @@ def intersection_of_line_and_plane(xline, xplane):
     (可以优化为向量的叉乘)
     """
     assert isinstance(xline, line) and isinstance(xplane, plane)
-    if dot_multip(xline.direction, xplane.vector):
-        temp = dot_multip((xplane.origin - xline.origin), xplane.vector) / dot_multip(xline.direction, xplane.vector)
+    if dot_multiply(xline.direction, xplane.vector):
+        temp = dot_multiply((xplane.origin - xline.origin), xplane.vector) / dot_multiply(xline.direction,
+                                                                                          xplane.vector)
         return xline.get_point_from_t(temp)
     else:
         return None
@@ -67,7 +69,7 @@ def create_plane_from_3point(xpoint1, xpoint2, xpoint3):
     assert isinstance(xpoint1, point) and isinstance(xpoint2, point) and isinstance(xpoint3, point)
     xvector1 = xpoint1 - xpoint2
     xvector2 = xpoint1 - xpoint3
-    return plane(xpoint1, cross_multip(xvector1, xvector2))
+    return plane(xpoint1, cross_multiply(xvector1, xvector2))
 
 
 def point_rotate(x_point, x_matrix, x_center=point(0, 0, 0)):
@@ -114,7 +116,8 @@ def triangle_slice_rotate(x_triangle_slice, x_matrix, x_center=point(0, 0, 0)):
     """
     三角形三个顶点绕旋转中心旋转,法向量绕原点旋转
     """
-    assert isinstance(x_triangle_slice, triangle_slice) and isinstance(x_matrix, np.ndarray) and isinstance(x_center, point)
+    assert isinstance(x_triangle_slice, triangle_slice) and isinstance(x_matrix, np.ndarray) and isinstance(x_center,
+                                                                                                            point)
     new_vertex = triangle_rotate(x_triangle_slice.vertex, x_matrix, x_center)
     new_facet = point_rotate(x_triangle_slice.facet, x_matrix)
     return triangle_slice(new_facet, new_vertex)
@@ -147,13 +150,23 @@ def is_point_in_triangle_2D(x_point, x_triangle_2D):
     如果t1*t2*t3 = 0，则表示该点在三角形的边界
     """
     assert isinstance(x_point, point_2D) and isinstance(x_triangle_2D, triangle_2D)
+
+    tx = x_point.x
+    ty = x_point.y
+    max_x = max([x_triangle_2D.vertex1.x, x_triangle_2D.vertex2.x, x_triangle_2D.vertex3.x])
+    min_x = min([x_triangle_2D.vertex1.x, x_triangle_2D.vertex2.x, x_triangle_2D.vertex3.x])
+    max_y = max([x_triangle_2D.vertex1.y, x_triangle_2D.vertex2.y, x_triangle_2D.vertex3.y])
+    min_y = min([x_triangle_2D.vertex1.y, x_triangle_2D.vertex2.y, x_triangle_2D.vertex3.y])
+    if not (min_x <= tx <= max_x and min_y <= ty <= max_y):
+        return False
+
     PA = x_triangle_2D.vertex1 - x_point
     PB = x_triangle_2D.vertex2 - x_point
     PC = x_triangle_2D.vertex3 - x_point
-    t1 = cross_multip_2D(PA, PB)
-    t2 = cross_multip_2D(PB, PC)
-    t3 = cross_multip_2D(PC, PA)
-    if t1 > 0 and t2 > 0 and t3 > 0 or t1 < 0 and t2 < 0 and t3 < 0 or abs(t1 * t2 * t3) <= epsilon:
+    t1 = cross_multiply_2D(PA, PB)
+    t2 = cross_multiply_2D(PB, PC)
+    t3 = cross_multiply_2D(PC, PA)
+    if t1 > 0 and t2 > 0 and t3 > 0 or t1 < 0 and t2 < 0 and t3 < 0:
         return True
     else:
         return False
@@ -166,10 +179,10 @@ def get_rotate_matrix_from_two_vector(x_vector_old, x_vector_new):
     返回的矩阵为由老向量至新向量的矩阵
     """
     assert isinstance(x_vector_old, point) and isinstance(x_vector_new, point)
-    x_theta = np.arccos(dot_multip(x_vector_old, x_vector_new) / (x_vector_old.norm() * x_vector_new.norm()))
+    x_theta = np.arccos(dot_multiply(x_vector_old, x_vector_new) / (x_vector_old.norm() * x_vector_new.norm()))
     if x_theta <= epsilon:
         return np.eye(3)
-    x_axis = cross_multip(x_vector_old, x_vector_new)
+    x_axis = cross_multiply(x_vector_old, x_vector_new)
     return BaseTransfer.Rodrigues((x_axis * x_theta).to_array())
 
 
@@ -189,10 +202,7 @@ def intersection_of_line_and_model(x_line, x_model):
         i = i + 1
         temp = intersection_of_line_and_triangle_slice(x_line, x_triangle_slice)
         if temp:
-            print(f'相交的三角面片{x_triangle_slice}')
             triangle_slice_model = STLModel([x_triangle_slice])
-            triangle_slice_model.save(f'D:/全局标定测试/triangle_{i}.stl')
-            print(f'循环了{i}次')
             return temp
 
 
@@ -202,7 +212,8 @@ def intersection_of_line_and_triangle_slice(x_line, x_triangle_slice):
     """
     assert isinstance(x_line, line) and isinstance(x_triangle_slice, triangle_slice)
     if is_point_in_triangle_2D(x_line.origin.to_point_2d(), x_triangle_slice.vertex.to_triangle_2d()):
-        x_plane = create_plane_from_3point(x_triangle_slice.vertex.vertex1, x_triangle_slice.vertex.vertex2,
+        x_plane = create_plane_from_3point(x_triangle_slice.vertex.vertex1,
+                                           x_triangle_slice.vertex.vertex2,
                                            x_triangle_slice.vertex.vertex3)
         intersection_point = intersection_of_line_and_plane(x_line, x_plane)
         if intersection_point:
@@ -236,8 +247,8 @@ def test_unit():
     # # region 叉乘测试
     # m_point1 = point(1, 22, 0)
     # m_point2 = point(3, 1, 0)
-    # print(cross_multip(m_point1, m_point2))
-    # print(dot_multip(m_point1, m_point2))
+    # print(cross_multiply(m_point1, m_point2))
+    # print(dot_multiply(m_point1, m_point2))
     # # endregion
 
     # # region 测试get_rotate_matrix_from_two_vector
@@ -258,28 +269,40 @@ def test_unit():
 
     # region 测试intersection_of_line_and_model
     m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型-Binary格式.stl')
-    print('stl读取结束')
+    print(f'stl读取结束,共{len(m_model)}个三角面片')
     list_intersection = []
-    '''
-    从(-2, range(-100,100), 20)点发出光线
-    '''
-    for i in range(99, 100):
-        m_line = line(xorigin=point(0, i, 20), xdirection=point(0, 0, -1))
-        print(f'射线的起点：{m_line.origin}')
-        temp = intersection_of_line_and_model(m_line, m_model)
-        if temp:
-            print(f'射线与模型的交点{temp}')
-            list_intersection.append(temp)
-    m_path = r'D:\全局标定测试\result.txt'
-    with open(m_path, 'w') as f:
-        for x in list_intersection:
-            print(f'{x.x},{x.y},{x.z}\n', file=f)
+    for j in range(-40, 40):
+        '''
+        从(-2, range(-100,100), 20)点发出光线
+        '''
+        for i in range(-100, 100):
+
+            start_time = time.time()
+
+            m_line = line(xorigin=point(j, i, 20), xdirection=point(0, 0, -1))
+            print(f'射线的起点：{m_line.origin}', end=',')
+            temp = intersection_of_line_and_model(m_line, m_model)
+            if temp:
+                list_intersection.append(temp)
+                end_time = time.time()
+                print(f'耗时 {end_time - start_time} s')
+            else:
+                print(f'无交点', end=',')
+                end_time = time.time()
+                print(f'耗时 {end_time - start_time} s')
+
+        m_path = r'D:\全局标定测试\result.txt'
+        with open(m_path, 'w') as f:
+            for x in list_intersection:
+                print(f'{x.x},{x.y},{x.z}\n', file=f)
     # endregion
 
     # # region 测试intersection_of_line_and_triangle_slice
-    # m_line = line(xorigin=point(1, 1, 100), xdirection=point(0, 0, -1))
-    # m_triangle_slice = triangle_slice(x_facet=(0, 0, 1),
-    #                                   x_vertex=triangle(point(0, 0, 0), point(2, 0, 0), point(0, 2, 2)))
+    # m_line = line(xorigin=point(0.000,99.000,20.000), xdirection=point(0, 0, -1))
+    # m_triangle_slice = triangle_slice(x_facet=(0.000,0.000,0.024),
+    #                                   x_vertex=triangle(point(-0.000,43.307,-4.210),
+    #                                                     point(-0.012,43.282,-4.210),
+    #                                                     point(-0.000,41.300,-4.210)))
     # print(intersection_of_line_and_triangle_slice(m_line,m_triangle_slice))
     # # endregion
 

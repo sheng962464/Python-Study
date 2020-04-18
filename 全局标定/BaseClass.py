@@ -51,7 +51,7 @@ class point:
         return point(self.__x / other, self.__y / other, self.__z / other)
 
     def __str__(self):
-        return f'({self.__x},{self.__y},{self.__z})'
+        return f'({self.__x:.3f},{self.__y:.3f},{self.__z:.3f})'
 
     def __len__(self):
         return len(self.to_array())
@@ -121,7 +121,7 @@ class point_2D:
         return point_2D(self.__x / other, self.__y / other)
 
     def __str__(self):
-        return f'({self.__x},{self.__y})'
+        return f'({self.__x:.3f},{self.__y:.3f})'
 
     def __len__(self):
         return len(self.to_array())
@@ -400,6 +400,7 @@ class STLModel:
     STL模型类
     可以增加一个STL法向量修复的函数，因为模型的法向量可能会出错
     """
+
     def __init__(self, x_tri_list):
         """
         STL模型初始化
@@ -506,6 +507,57 @@ class STLModel:
         return
 
 
+class box_2D:
+    def __init__(self, x_min, x_max, y_min, y_max):
+        """
+        设定 box_2D 的范围
+        """
+        self.__x_min = x_min
+        self.__x_max = x_max
+        self.__y_min = y_min
+        self.__y_max = y_max
+
+    @property
+    def x_max(self):
+        return self.__x_max
+
+    @property
+    def x_min(self):
+        return self.__x_min
+
+    @property
+    def y_max(self):
+        return self.__y_max
+
+    @property
+    def y_min(self):
+        return self.__y_min
+
+    @x_max.setter
+    def x_max(self, xx):
+        self.__x_max = xx
+
+    @x_min.setter
+    def x_min(self, xx):
+        self.__x_min = xx
+
+    @y_max.setter
+    def y_max(self, xy):
+        self.__y_max = xy
+
+    @y_min.setter
+    def y_min(self, xy):
+        self.__y_min = xy
+
+    def vertex(self):
+        return f'\n{point_2D(self.__x_min,self.__y_max)},{point_2D(self.__x_max,self.__y_max)} \n' \
+               f'{point_2D(self.__x_min,self.__y_min)},{point_2D(self.__x_max,self.__y_min)}'
+
+    def __str__(self):
+        return f'\n x_min = {self.__x_min} \n x_max = {self.__x_max}\n' \
+               f' y_min = {self.__y_min} \n y_max = {self.__y_max}'
+
+
 def test_unit():
     pass
 
@@ -535,17 +587,25 @@ def test_unit():
     # print('测试print函数：', m_plane)
     # # endregion 测试plane类
 
-    # region 测试sensor类
-    m_sensor = sensor(x_fix_angle=(0, 0, 1))
-    m_sensor.sensor_absolute_move([0, 1, 1])
-    print(m_sensor)
-    save_point_path = os.path.join(save_folder, 'sensor.txt')
-    m_sensor.save(save_point_path)
-    # endregion
+    # # region 测试sensor类
+    # m_sensor = sensor(x_fix_angle=(0, 0, 1))
+    # m_sensor.sensor_absolute_move([0, 1, 1])
+    # print(m_sensor)
+    # save_point_path = os.path.join(save_folder, 'sensor.txt')
+    # m_sensor.save(save_point_path)
+    # # endregion
 
     # # region 测试STL类
     # m_stl_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型.stl')
     # m_stl_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
+    # # endregion
+
+    # # region 测试box_2D类
+    # m_box = box_2D(-1, 1, -1, 1)
+    #
+    # print(f'盒子的范围为：{m_box}')
+    # print(f'盒子的顶点为：{m_box.vertex()}')
+    #
     # # endregion
 
 

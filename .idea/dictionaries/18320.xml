@@ -2,6 +2,10 @@
   <dictionary name="18320">
     <words>
       <w>dest</w>
+      <w>endfacet</w>
+      <w>endloop</w>
+      <w>endsolid</w>
+      <w>octree</w>
       <w>sqrt</w>
       <w>toarray</w>
       <w>xdirection</w>
