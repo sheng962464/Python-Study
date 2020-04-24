@@ -6,7 +6,10 @@
       <w>endfacet</w>
       <w>endloop</w>
       <w>endsolid</w>
+      <w>mspaint</w>
       <w>octree</w>
+      <w>popen</w>
+      <w>snipaste</w>
       <w>sqrt</w>
       <w>toarray</w>
       <w>xdirection</w>

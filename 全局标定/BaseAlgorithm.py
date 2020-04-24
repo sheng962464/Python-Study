@@ -195,10 +195,13 @@ def intersection_of_line_and_model(x_line, x_model):
 
     """
     assert isinstance(x_line, line) and isinstance(x_model, STLModel)
-    matrix_line_to_z = get_rotate_matrix_from_two_vector(x_line.direction, point(0, 0, -1))
-    temp_model = model_rotate(x_model, matrix_line_to_z)
+
+    # matrix_line_to_z = get_rotate_matrix_from_two_vector(x_line.direction, point(0, 0, -1))
+    # temp_model = model_rotate(x_model, matrix_line_to_z)
+
+
     i = 0
-    for x_triangle_slice in temp_model:
+    for x_triangle_slice in x_model:
         i = i + 1
         temp = intersection_of_line_and_triangle_slice(x_line, x_triangle_slice)
         if temp:
@@ -271,11 +274,11 @@ def test_unit():
     m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型-Binary格式.stl')
     print(f'stl读取结束,共{len(m_model)}个三角面片')
     list_intersection = []
-    for j in range(-40, 40):
+    for j in range(-30, 30):
         '''
         从(-2, range(-100,100), 20)点发出光线
         '''
-        for i in range(-100, 100):
+        for i in range(-75, 75):
 
             start_time = time.time()
 

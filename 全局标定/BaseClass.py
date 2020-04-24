@@ -248,14 +248,6 @@ class sensor:
         return f'传感器输出结束,共{len(self.laser)}条激光线'
 
 
-class model:
-    def __init__(self):
-        pass
-
-    def save(self):
-        pass
-
-
 class triangle_2D:
     def __init__(self, x_vertex1=point_2D(0, 0), x_vertex2=point_2D(0, 0), x_vertex3=point_2D(0, 0)):
         assert isinstance(x_vertex1, point_2D) and isinstance(x_vertex2, point_2D) and isinstance(x_vertex3, point_2D)
@@ -391,6 +383,14 @@ class triangle_slice:
     def vertex(self, x_vertex):
         self.__vertex = deepcopy(x_vertex)
 
+    def mesh_init(self):
+        # 三角面片初始化，重新计算三角面片的法向量
+        v1, v2, v3 = self.__vertex.vertex1, self.__vertex.vertex2, self.__vertex.vertex3
+        nx = (v1.y - v3.y) * (v2.z - v3.z) - (v1.z - v3.z) * (v2.y - v3.y)
+        ny = (v1.z - v3.z) * (v2.x - v3.x) - (v2.z - v3.z) * (v1.x - v3.x)
+        nz = (v1.x - v3.x) * (v2.y - v3.y) - (v2.x - v3.x) * (v1.y - v3.y)
+        self.__facet = point(nx, ny, nz)
+
     def __str__(self):
         return f'facet: {self.__facet}, vertex: {self.__vertex}'
 
@@ -506,6 +506,11 @@ class STLModel:
         print('STL文件保存结束：成功')
         return
 
+    def model_init(self):
+        # 对模型的三角面片的法向量进行初始化，防止法向量出错
+        for xx in self:  # type:triangle_slice
+            xx.mesh_init()
+
 
 class box_2D:
     def __init__(self, x_min, x_max, y_min, y_max):
@@ -550,8 +555,8 @@ class box_2D:
         self.__y_min = xy
 
     def vertex(self):
-        return f'\n{point_2D(self.__x_min,self.__y_max)},{point_2D(self.__x_max,self.__y_max)} \n' \
-               f'{point_2D(self.__x_min,self.__y_min)},{point_2D(self.__x_max,self.__y_min)}'
+        return f'\n{point_2D(self.__x_min, self.__y_max)},{point_2D(self.__x_max, self.__y_max)} \n' \
+               f'{point_2D(self.__x_min, self.__y_min)},{point_2D(self.__x_max, self.__y_min)}'
 
     def __str__(self):
         return f'\n x_min = {self.__x_min} \n x_max = {self.__x_max}\n' \
