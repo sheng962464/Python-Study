@@ -10,7 +10,7 @@ def unlock(x_target_path):
         # files 表示该文件夹下的文件list
         # 遍历文件
         for f in files:
-            if f.endswith('.c') or f.endswith('.cpp') or f.endswith('.h') or f.endswith('.cs') or f.endswith('.txt'):
+            if f.endswith('.png') or f.endswith('.jpg') or f.endswith('.h') or f.endswith('.cs') or f.endswith('.txt'):
                 index = index + 1
                 file_path = os.path.join(root, f)
                 new_file_name = os.path.splitext(file_path)[0]+'.tx'
@@ -31,6 +31,6 @@ def unlock(x_target_path):
 
 
 if __name__ == '__main__':
-    target_path = r'C:\Users\18320\Desktop\#8'
+    target_path = "E:\\下载\\TestReal_HuaWei-0371538ba5fc6e91f6941f6d600802a517be944f"
     unlock(target_path)
     print('success!!!')
