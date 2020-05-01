@@ -2,8 +2,11 @@ from BaseClass import *
 import numpy as np
 import time
 
-epsilon = 1e-6
-
+epsilon1 = 1e-1
+epsilon2 = 1e-2
+epsilon3 = 1e-3
+epsilon5 = 1e-5
+epsilon8 = 1e-8
 
 def cross_multiply(x_point1, x_point2):
     """
@@ -151,13 +154,9 @@ def is_point_in_triangle_2D(x_point, x_triangle_2D):
     """
     assert isinstance(x_point, Point2D) and isinstance(x_triangle_2D, Triangle2D)
 
-    tx = x_point.x
-    ty = x_point.y
-    max_x = max([x_triangle_2D.vertex1.x, x_triangle_2D.vertex2.x, x_triangle_2D.vertex3.x])
-    min_x = min([x_triangle_2D.vertex1.x, x_triangle_2D.vertex2.x, x_triangle_2D.vertex3.x])
-    max_y = max([x_triangle_2D.vertex1.y, x_triangle_2D.vertex2.y, x_triangle_2D.vertex3.y])
-    min_y = min([x_triangle_2D.vertex1.y, x_triangle_2D.vertex2.y, x_triangle_2D.vertex3.y])
-    if not (min_x <= tx <= max_x and min_y <= ty <= max_y):
+    tx, ty = x_point.x,x_point.y
+    t_box = x_triangle_2D.get_box_2d()
+    if not (t_box.x_min <= tx <= t_box.x_max and t_box.y_min <= ty <= t_box.y_max):
         return False
 
     PA = x_triangle_2D.vertex1 - x_point
@@ -180,7 +179,7 @@ def get_rotate_matrix_from_two_vector(x_vector_old, x_vector_new):
     """
     assert isinstance(x_vector_old, Point3D) and isinstance(x_vector_new, Point3D)
     x_theta = np.arccos(dot_multiply(x_vector_old, x_vector_new) / (x_vector_old.norm() * x_vector_new.norm()))
-    if x_theta <= epsilon:
+    if x_theta <= epsilon5:
         return np.eye(3)
     x_axis = cross_multiply(x_vector_old, x_vector_new)
     return BaseTransfer.Rodrigues((x_axis * x_theta).to_array())
@@ -198,7 +197,6 @@ def intersection_of_line_and_model(x_line, x_model):
 
     # matrix_line_to_z = get_rotate_matrix_from_two_vector(x_line.direction, Point3D(0, 0, -1))
     # temp_model = model_rotate(x_model, matrix_line_to_z)
-
 
     i = 0
     for x_triangle_slice in x_model:
@@ -254,13 +252,14 @@ def test_unit():
     # print(dot_multiply(m_point1, m_point2))
     # # endregion
 
-    # region 测试get_rotate_matrix_from_two_vector
-    m_vector1 = Point3D(0, 0, 1)
-    m_vector2 = Point3D(0, 0, 1)
-    print(get_rotate_matrix_from_two_vector(m_vector1, m_vector2))
-    # endregion
+    # # region 测试get_rotate_matrix_from_two_vector
+    # m_vector1 = Point3D(0, 0, 1)
+    # m_vector2 = Point3D(0, 0, 1)
+    # print(get_rotate_matrix_from_two_vector(m_vector1, m_vector2))
+    # # endregion
 
     # # region 测试is_point_in_triangle_2D()
+    # start_time = time.time()
     # m_point = Point3D(0.1, 0, 2)
     # m_triangle = Triangle3D(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 1))
     # m_point_2D = m_point.to_point_2d()
@@ -268,37 +267,37 @@ def test_unit():
     # print(m_point_2D)
     # print(m_triangle_2D)
     # print(is_point_in_triangle_2D(m_point_2D, m_triangle_2D))
+    # end_time = time.time()
+    # print(f'总共耗时：{end_time - start_time}s')
     # # endregion
 
-    # # region 测试intersection_of_line_and_model
-    # m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型-Binary格式.stl')
-    # print(f'stl读取结束,共{len(m_model)}个三角面片')
-    # list_intersection = []
-    # for j in range(-400, 400):
-    #     '''
-    #     从(-2, range(-100,100), 20)点发出光线
-    #     '''
-    #     for i in range(-800, 800):
-    #
-    #         start_time = time.time()
-    #
-    #         m_line = Line3D(xorigin=Point3D(j * 0.1, i * 0.1, 20), xdirection=Point3D(0, 0, -1))
-    #         print(f'射线的起点：{m_line.origin}', end=',')
-    #         temp = intersection_of_line_and_model(m_line, m_model)
-    #         if temp:
-    #             list_intersection.append(temp)
-    #             end_time = time.time()
-    #             print(f'耗时 {end_time - start_time} s')
-    #         else:
-    #             print(f'无交点', end=',')
-    #             end_time = time.time()
-    #             print(f'耗时 {end_time - start_time} s')
-    #
-    #     m_path = r'D:\全局标定测试\result.txt'
-    #     with open(m_path, 'w') as f:
-    #         for x in list_intersection:
-    #             print(f'{x.x},{x.y},{x.z}\n', file=f)
-    # # endregion
+    # region 测试intersection_of_line_and_model
+    m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型-Binary格式.stl')
+    print(f'stl读取结束,共{len(m_model)}个三角面片')
+    list_intersection = []
+    for j in range(-400, 400):
+        '''
+        从(-2, range(-100,100), 20)点发出光线
+        '''
+        for i in range(-800, 800):
+            start_time = time.time()
+            m_line = Line3D(xorigin=Point3D(j * 0.1, i * 0.1, 20), xdirection=Point3D(0, 0, -1))
+            print(f'射线的起点：{m_line.origin}', end=',')
+            temp = intersection_of_line_and_model(m_line, m_model)
+            if temp:
+                list_intersection.append(temp)
+                end_time = time.time()
+                print(f'耗时 {end_time - start_time} s')
+            else:
+                print(f'无交点', end=',')
+                end_time = time.time()
+                print(f'耗时 {end_time - start_time} s')
+
+        m_path = r'D:\全局标定测试\result.txt'
+        with open(m_path, 'w') as f:
+            for x in list_intersection:
+                print(f'{x.x},{x.y},{x.z}\n', file=f)
+    # endregion
 
     # # region 测试intersection_of_line_and_triangle_slice
     # m_line = Line3D(xorigin=Point3D(0.000,99.000,20.000), xdirection=Point3D(0, 0, -1))
