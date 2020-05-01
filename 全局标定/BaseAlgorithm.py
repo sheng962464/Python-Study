@@ -105,11 +105,11 @@ def triangle_rotate(x_triangle, x_matrix, x_center=Point3D(0, 0, 0)):
     """
     三角形三个顶点绕旋转中心旋转
     """
-    assert isinstance(x_triangle, Triangle) and isinstance(x_matrix, np.ndarray) and isinstance(x_center, Point3D)
+    assert isinstance(x_triangle, Triangle3D) and isinstance(x_matrix, np.ndarray) and isinstance(x_center, Point3D)
     new_vertex1 = point_rotate(x_triangle.vertex1, x_matrix, x_center)
     new_vertex2 = point_rotate(x_triangle.vertex2, x_matrix, x_center)
     new_vertex3 = point_rotate(x_triangle.vertex3, x_matrix, x_center)
-    return Triangle(new_vertex1, new_vertex2, new_vertex3)
+    return Triangle3D(new_vertex1, new_vertex2, new_vertex3)
 
 
 def triangle_slice_rotate(x_triangle_slice, x_matrix, x_center=Point3D(0, 0, 0)):
@@ -262,7 +262,7 @@ def test_unit():
 
     # # region 测试is_point_in_triangle_2D()
     # m_point = Point3D(0.1, 0, 2)
-    # m_triangle = Triangle(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 1))
+    # m_triangle = Triangle3D(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 1))
     # m_point_2D = m_point.to_point_2d()
     # m_triangle_2D = m_triangle.to_triangle_2d()
     # print(m_point_2D)
@@ -303,7 +303,7 @@ def test_unit():
     # # region 测试intersection_of_line_and_triangle_slice
     # m_line = Line3D(xorigin=Point3D(0.000,99.000,20.000), xdirection=Point3D(0, 0, -1))
     # m_triangle_slice = TriangleSlice(x_facet=(0.000,0.000,0.024),
-    #                                   x_vertex=Triangle(Point3D(-0.000,43.307,-4.210),
+    #                                   x_vertex=Triangle3D(Point3D(-0.000,43.307,-4.210),
     #                                                     Point3D(-0.012,43.282,-4.210),
     #                                                     Point3D(-0.000,41.300,-4.210)))
     # print(intersection_of_line_and_triangle_slice(m_line,m_triangle_slice))

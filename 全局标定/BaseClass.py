@@ -224,7 +224,8 @@ class Plane:
             for yy in range(-50, 50):
                 list_of_point.append(Point3D(xx, yy, 0))
         old_vector = Point3D(0, 0, 1)
-        x_theta = np.arccos(np.dot(old_vector.to_array(), self.vector.to_array()) / (old_vector.norm() * self.vector.norm()))
+        x_theta = np.arccos(
+            np.dot(old_vector.to_array(), self.vector.to_array()) / (old_vector.norm() * self.vector.norm()))
         if x_theta < 1e-5:
             with open(x_file_path, 'w') as f:
                 for x_point in list_of_point:
@@ -313,11 +314,18 @@ class Triangle2D:
     def vertex3(self, x_vertex3):
         self.__vertex3 = deepcopy(x_vertex3)
 
+    def get_box_2d(self):
+        x_min = min([self.__vertex1.x, self.__vertex2.x, self.__vertex3.x])
+        x_max = max([self.__vertex1.x, self.__vertex2.x, self.__vertex3.x])
+        y_min = min([self.__vertex1.y, self.__vertex2.y, self.__vertex3.y])
+        y_max = max([self.__vertex1.y, self.__vertex2.y, self.__vertex3.y])
+        return Box2D(x_min, x_max, y_min, y_max)
+
     def __str__(self):
         return f'{self.__vertex1},{self.__vertex2},{self.__vertex3}'
 
 
-class Triangle:
+class Triangle3D:
     def __init__(self, x_vertex1=Point3D(0, 0, 0), x_vertex2=Point3D(0, 0, 0), x_vertex3=Point3D(0, 0, 0)):
         assert isinstance(x_vertex1, Point3D) and isinstance(x_vertex2, Point3D) and isinstance(x_vertex3, Point3D)
         self.__vertex1 = deepcopy(x_vertex1)
@@ -372,27 +380,21 @@ class Triangle:
             cross_abc[0] * cross_abc[0] + cross_abc[1] * cross_abc[1] + cross_abc[2] * cross_abc[2]) / 2
         return triangle_area
 
-    def is_in_triangle(self, x_point):
-        # 判断点是否在三角形内部
-        # 通过面积的方式来判断，当点xPoint内部时，四个三角形的面积加起来是相等的
-        triangle_1 = Triangle(x_point, self.__vertex2, self.__vertex3)
-        triangle_2 = Triangle(self.__vertex1, x_point, self.__vertex3)
-        triangle_3 = Triangle(self.__vertex1, self.__vertex2, x_point)
-        area1 = self.area()
-        area2 = triangle_1.area()
-        area3 = triangle_2.area()
-        area4 = triangle_3.area()
-        area_all = area2 + area3 + area4
-        if abs(area_all - area1) < area1 / 100:
-            return True
-        return False
+    def get_box_3d(self):
+        x_min = min([self.__vertex1.x, self.__vertex2.x, self.__vertex3.x])
+        x_max = max([self.__vertex1.x, self.__vertex2.x, self.__vertex3.x])
+        y_min = min([self.__vertex1.y, self.__vertex2.y, self.__vertex3.y])
+        y_max = max([self.__vertex1.y, self.__vertex2.y, self.__vertex3.y])
+        z_min = min([self.__vertex1.z, self.__vertex2.z, self.__vertex3.z])
+        z_max = max([self.__vertex1.z, self.__vertex2.z, self.__vertex3.z])
+        return Box3D(x_min, x_max, y_min, y_max, z_min, z_max)
 
     def __str__(self):
         return f'{self.__vertex1},{self.__vertex2},{self.__vertex3}'
 
 
 class TriangleSlice:
-    def __init__(self, x_facet=Point3D(), x_vertex=Triangle()):
+    def __init__(self, x_facet=Point3D(), x_vertex=Triangle3D()):
         """
         三角面片初始化函数
         :param x_facet: 法向量
@@ -588,13 +590,75 @@ class Box2D:
     def y_min(self, xy):
         self.__y_min = xy
 
-    def vertex(self):
-        return f'\n{Point2D(self.__x_min, self.__y_max)},{Point2D(self.__x_max, self.__y_max)} \n' \
-               f'{Point2D(self.__x_min, self.__y_min)},{Point2D(self.__x_max, self.__y_min)}'
+    def __str__(self):
+        return f' x_min = {self.__x_min:.3f}    x_max = {self.__x_max:.3f}\n' \
+               f' y_min = {self.__y_min:.3f}    y_max = {self.__y_max:.3f}'
+
+
+class Box3D:
+    def __init__(self, x_min, x_max, y_min, y_max, z_min, z_max):
+        """
+        设定 Box3D 的范围
+        """
+        self.__x_min = x_min
+        self.__x_max = x_max
+        self.__y_min = y_min
+        self.__y_max = y_max
+        self.__z_min = z_min
+        self.__z_max = z_max
+
+    @property
+    def x_max(self):
+        return self.__x_max
+
+    @property
+    def x_min(self):
+        return self.__x_min
+
+    @property
+    def y_max(self):
+        return self.__y_max
+
+    @property
+    def y_min(self):
+        return self.__y_min
+
+    @property
+    def z_max(self):
+        return self.__z_max
+
+    @property
+    def z_min(self):
+        return self.__z_min
+
+    @x_max.setter
+    def x_max(self, xx):
+        self.__x_max = xx
+
+    @x_min.setter
+    def x_min(self, xx):
+        self.__x_min = xx
+
+    @y_max.setter
+    def y_max(self, xy):
+        self.__y_max = xy
+
+    @y_min.setter
+    def y_min(self, xy):
+        self.__y_min = xy
+
+    @z_max.setter
+    def z_max(self, xz):
+        self.__z_max = xz
+
+    @z_min.setter
+    def z_min(self, xz):
+        self.__z_min = xz
 
     def __str__(self):
-        return f'\n x_min = {self.__x_min} \n x_max = {self.__x_max}\n' \
-               f' y_min = {self.__y_min} \n y_max = {self.__y_max}'
+        return f' x_min = {self.__x_min:.3f}    x_max = {self.__x_max:.3f}\n' \
+               f' y_min = {self.__y_min:.3f}    y_max = {self.__y_max:.3f}\n' \
+               f' z_min = {self.__z_min:.3f}    z_max = {self.__z_max:.3f}'
 
 
 def test_unit():
@@ -644,12 +708,16 @@ def test_unit():
     # # endregion
 
     # # region 测试box_2D类
-    # m_box = Box2D(-1, 1, -1, 1)
-    #
-    # print(f'盒子的范围为：{m_box}')
-    # print(f'盒子的顶点为：{m_box.vertex()}')
-    #
+    # m_triangle_2d = Triangle2D(Point2D(0, 0), Point2D(1, 0), Point2D(0, 1))
+    # m_box = m_triangle_2d.get_box_2d()
+    # print(f'盒子的范围为：\n{m_box}')
     # # endregion
+
+    # region 测试box_3D类
+    m_triangle_3d = Triangle3D(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 0))
+    m_box = m_triangle_3d.get_box_3d()
+    print(f'盒子的范围为：\n{m_box}')
+    # endregion
 
 
 if __name__ == '__main__':
