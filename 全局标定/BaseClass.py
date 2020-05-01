@@ -4,7 +4,7 @@ import BaseTransfer
 from copy import deepcopy
 
 
-class point:
+class Point3D:
     def __init__(self, xx=0.0, xy=0.0, xz=0.0):
         self.__x = xx
         self.__y = xy
@@ -35,20 +35,20 @@ class point:
         self.__z = xz
 
     def __add__(self, other):
-        assert isinstance(other, point)
-        return point(self.__x + other.__x, self.__y + other.__y, self.__z + other.__z)
+        assert isinstance(other, Point3D)
+        return Point3D(self.__x + other.__x, self.__y + other.__y, self.__z + other.__z)
 
     def __sub__(self, other):
-        assert isinstance(other, point)
-        return point(self.__x - other.__x, self.__y - other.__y, self.__z - other.__z)
+        assert isinstance(other, Point3D)
+        return Point3D(self.__x - other.__x, self.__y - other.__y, self.__z - other.__z)
 
     def __mul__(self, other):
         assert isinstance(other, (int, float))
-        return point(self.__x * other, self.__y * other, self.__z * other)
+        return Point3D(self.__x * other, self.__y * other, self.__z * other)
 
     def __truediv__(self, other):
         assert isinstance(other, (int, float)) and other
-        return point(self.__x / other, self.__y / other, self.__z / other)
+        return Point3D(self.__x / other, self.__y / other, self.__z / other)
 
     def __str__(self):
         return f'({self.__x:.3f},{self.__y:.3f},{self.__z:.3f})'
@@ -61,6 +61,9 @@ class point:
             print(f'{self.__x},{self.__y},{self.__z}', file=x_file)
 
     def to_array(self):
+        """
+        点转化为numpy数组
+        """
         return np.array([self.__x, self.__y, self.__z])
 
     def to_norm(self):
@@ -80,10 +83,10 @@ class point:
         """
         Z向投影，返回平面的2D点
         """
-        return point_2D(self.__x, self.__y)
+        return Point2D(self.__x, self.__y)
 
 
-class point_2D:
+class Point2D:
     def __init__(self, xx=0.0, xy=0.0):
         self.__x = xx
         self.__y = xy
@@ -105,20 +108,20 @@ class point_2D:
         self.__y = xy
 
     def __add__(self, other):
-        assert isinstance(other, point_2D)
-        return point_2D(self.__x + other.__x, self.__y + other.__y)
+        assert isinstance(other, Point2D)
+        return Point2D(self.__x + other.__x, self.__y + other.__y)
 
     def __sub__(self, other):
-        assert isinstance(other, point_2D)
-        return point_2D(self.__x - other.__x, self.__y - other.__y)
+        assert isinstance(other, Point2D)
+        return Point2D(self.__x - other.__x, self.__y - other.__y)
 
     def __mul__(self, other):
         assert isinstance(other, (int, float))
-        return point_2D(self.__x * other, self.__y * other)
+        return Point2D(self.__x * other, self.__y * other)
 
     def __truediv__(self, other):
         assert isinstance(other, (int, float)) and other
-        return point_2D(self.__x / other, self.__y / other)
+        return Point2D(self.__x / other, self.__y / other)
 
     def __str__(self):
         return f'({self.__x:.3f},{self.__y:.3f})'
@@ -131,6 +134,9 @@ class point_2D:
             print(f'{self.__x},{self.__y}', file=x_file)
 
     def to_array(self):
+        """
+        点转化为numpy数组
+        """
         return np.array([self.__x, self.__y])
 
     def to_norm(self):
@@ -144,10 +150,10 @@ class point_2D:
         """
         计算 sqrt(x*x + y*y)
         """
-        return np.linalg.norm(self.to_array())
+        return float(np.linalg.norm(self.to_array()))
 
 
-class line:
+class Line3D:
     """
     直线的参数方程：
     x = m1 + v1 * t
@@ -156,7 +162,7 @@ class line:
     其中(m1,m2,m3)为直线上的点，(v1,v2,v3)为直线的方向向量
     """
 
-    def __init__(self, xorigin=point(0, 0, 0), xdirection=point(0, 0, 1)):
+    def __init__(self, xorigin=Point3D(0, 0, 0), xdirection=Point3D(0, 0, 1)):
         self.__origin = deepcopy(xorigin)
         self.__direction = deepcopy(xdirection)
 
@@ -185,28 +191,56 @@ class line:
         """
         return self.__origin + self.__direction * x_t
 
-    def save(self):
-        pass
+    def start_point(self):
+        return self.get_point_from_t(0)
+
+    def end_point(self):
+        return self.get_point_from_t(100)
+
+    def save(self, x_file_path):
+        with open(x_file_path, 'w') as f:
+            for i in range(100):
+                m_point = self.get_point_from_t(i)
+                print(f'{m_point.x},{m_point.y},{m_point.z}', file=f)
 
 
-class plane:
+class Plane:
     """
     面的点法式方程：
     vp1 * (x-n1) + vp2 * (y-n2) + vp3 * (z-n3) = 0
     """
 
-    def __init__(self, xorigin=point(0, 0, 0), xvector=point(0, 0, 1)):
+    def __init__(self, xorigin=Point3D(0, 0, 0), xvector=Point3D(0, 0, 1)):
         self.origin = deepcopy(xorigin)
         self.vector = deepcopy(xvector)
 
     def __str__(self):
         return f'origin:{self.origin},vector:{self.vector}'
 
-    def save(self):
-        pass
+    def save(self, x_file_path):
+        # 生成大小为100*100的XY平面，然后旋转到当前法向量，保存
+        list_of_point = []
+        for xx in range(-50, 50):
+            for yy in range(-50, 50):
+                list_of_point.append(Point3D(xx, yy, 0))
+        old_vector = Point3D(0, 0, 1)
+        x_theta = np.arccos(np.dot(old_vector.to_array(), self.vector.to_array()) / (old_vector.norm() * self.vector.norm()))
+        if x_theta < 1e-5:
+            with open(x_file_path, 'w') as f:
+                for x_point in list_of_point:
+                    print(f'{x_point.x},{x_point.y},{x_point.z}', file=f)
+        else:
+            a1, b1, c1 = old_vector.to_array()
+            a2, b2, c2 = self.vector.to_array()
+            x_axis = Point3D(b1 * c2 - b2 * c1, c1 * a2 - a1 * c2, a1 * b2 - a2 * b1).to_norm()
+            x_matrix = BaseTransfer.Rodrigues((x_axis * x_theta).to_array())
+            with open(x_file_path, 'w') as f:
+                for x_point in list_of_point:
+                    new_point_array = np.dot(x_matrix, x_point.to_array()) + self.origin.to_array()
+                    print(f'{new_point_array[0]},{new_point_array[1]},{new_point_array[2]}', file=f)
 
 
-class sensor:
+class Sensor:
     """
     传感器的本质为射线的集合
     点数，点间隔，安装角度，安装位置
@@ -226,7 +260,7 @@ class sensor:
         self.__laser_vector = np.dot(BaseTransfer.euler_angle_to_matrix(self.__fixAngle), np.array(self.__laser_vector))
         temp_trig_point = [self.__location + np.array([i * self.__pointInterval, 0, 0])
                            for i in range(-self.__pointNum // 2, self.__pointNum // 2)]
-        self.laser = [line(xorigin=point(*x), xdirection=point(*self.__laser_vector)) for x in temp_trig_point]
+        self.laser = [Line3D(xorigin=Point3D(*x), xdirection=Point3D(*self.__laser_vector)) for x in temp_trig_point]
 
     def sensor_absolute_move(self, x_location):
         # 绝对移动
@@ -248,9 +282,9 @@ class sensor:
         return f'传感器输出结束,共{len(self.laser)}条激光线'
 
 
-class triangle_2D:
-    def __init__(self, x_vertex1=point_2D(0, 0), x_vertex2=point_2D(0, 0), x_vertex3=point_2D(0, 0)):
-        assert isinstance(x_vertex1, point_2D) and isinstance(x_vertex2, point_2D) and isinstance(x_vertex3, point_2D)
+class Triangle2D:
+    def __init__(self, x_vertex1=Point2D(0, 0), x_vertex2=Point2D(0, 0), x_vertex3=Point2D(0, 0)):
+        assert isinstance(x_vertex1, Point2D) and isinstance(x_vertex2, Point2D) and isinstance(x_vertex3, Point2D)
         self.__vertex1 = deepcopy(x_vertex1)
         self.__vertex2 = deepcopy(x_vertex2)
         self.__vertex3 = deepcopy(x_vertex3)
@@ -283,9 +317,9 @@ class triangle_2D:
         return f'{self.__vertex1},{self.__vertex2},{self.__vertex3}'
 
 
-class triangle:
-    def __init__(self, x_vertex1=point(0, 0, 0), x_vertex2=point(0, 0, 0), x_vertex3=point(0, 0, 0)):
-        assert isinstance(x_vertex1, point) and isinstance(x_vertex2, point) and isinstance(x_vertex3, point)
+class Triangle:
+    def __init__(self, x_vertex1=Point3D(0, 0, 0), x_vertex2=Point3D(0, 0, 0), x_vertex3=Point3D(0, 0, 0)):
+        assert isinstance(x_vertex1, Point3D) and isinstance(x_vertex2, Point3D) and isinstance(x_vertex3, Point3D)
         self.__vertex1 = deepcopy(x_vertex1)
         self.__vertex2 = deepcopy(x_vertex2)
         self.__vertex3 = deepcopy(x_vertex3)
@@ -315,7 +349,7 @@ class triangle:
         self.__vertex3 = deepcopy(x_vertex3)
 
     def to_triangle_2d(self):
-        return triangle_2D(self.__vertex1.to_point_2d(), self.__vertex2.to_point_2d(), self.__vertex3.to_point_2d())
+        return Triangle2D(self.__vertex1.to_point_2d(), self.__vertex2.to_point_2d(), self.__vertex3.to_point_2d())
 
     def centroid(self):
         """
@@ -341,9 +375,9 @@ class triangle:
     def is_in_triangle(self, x_point):
         # 判断点是否在三角形内部
         # 通过面积的方式来判断，当点xPoint内部时，四个三角形的面积加起来是相等的
-        triangle_1 = triangle(x_point, self.__vertex2, self.__vertex3)
-        triangle_2 = triangle(self.__vertex1, x_point, self.__vertex3)
-        triangle_3 = triangle(self.__vertex1, self.__vertex2, x_point)
+        triangle_1 = Triangle(x_point, self.__vertex2, self.__vertex3)
+        triangle_2 = Triangle(self.__vertex1, x_point, self.__vertex3)
+        triangle_3 = Triangle(self.__vertex1, self.__vertex2, x_point)
         area1 = self.area()
         area2 = triangle_1.area()
         area3 = triangle_2.area()
@@ -357,8 +391,8 @@ class triangle:
         return f'{self.__vertex1},{self.__vertex2},{self.__vertex3}'
 
 
-class triangle_slice:
-    def __init__(self, x_facet=point(), x_vertex=triangle()):
+class TriangleSlice:
+    def __init__(self, x_facet=Point3D(), x_vertex=Triangle()):
         """
         三角面片初始化函数
         :param x_facet: 法向量
@@ -389,7 +423,7 @@ class triangle_slice:
         nx = (v1.y - v3.y) * (v2.z - v3.z) - (v1.z - v3.z) * (v2.y - v3.y)
         ny = (v1.z - v3.z) * (v2.x - v3.x) - (v2.z - v3.z) * (v1.x - v3.x)
         nz = (v1.x - v3.x) * (v2.y - v3.y) - (v2.x - v3.x) * (v1.y - v3.y)
-        self.__facet = point(nx, ny, nz)
+        self.__facet = Point3D(nx, ny, nz)
 
     def __str__(self):
         return f'facet: {self.__facet}, vertex: {self.__vertex}'
@@ -454,7 +488,7 @@ class STLModel:
         :param f:
         :return:
         """
-        tri_slice = triangle_slice()
+        tri_slice = TriangleSlice()
         tri_slice.facet = cls.point_read(f)
         tri_slice.vertex.vertex1 = cls.point_read(f)
         tri_slice.vertex.vertex2 = cls.point_read(f)
@@ -470,7 +504,7 @@ class STLModel:
         :param f:
         :return:
         """
-        xpoint = point()
+        xpoint = Point3D()
         xpoint.x = struct.unpack('f', f.read(4))[0]
         xpoint.y = struct.unpack('f', f.read(4))[0]
         xpoint.z = struct.unpack('f', f.read(4))[0]
@@ -508,14 +542,14 @@ class STLModel:
 
     def model_init(self):
         # 对模型的三角面片的法向量进行初始化，防止法向量出错
-        for xx in self:  # type:triangle_slice
+        for xx in self:  # type:TriangleSlice
             xx.mesh_init()
 
 
-class box_2D:
+class Box2D:
     def __init__(self, x_min, x_max, y_min, y_max):
         """
-        设定 box_2D 的范围
+        设定 Box2D 的范围
         """
         self.__x_min = x_min
         self.__x_max = x_max
@@ -555,8 +589,8 @@ class box_2D:
         self.__y_min = xy
 
     def vertex(self):
-        return f'\n{point_2D(self.__x_min, self.__y_max)},{point_2D(self.__x_max, self.__y_max)} \n' \
-               f'{point_2D(self.__x_min, self.__y_min)},{point_2D(self.__x_max, self.__y_min)}'
+        return f'\n{Point2D(self.__x_min, self.__y_max)},{Point2D(self.__x_max, self.__y_max)} \n' \
+               f'{Point2D(self.__x_min, self.__y_min)},{Point2D(self.__x_max, self.__y_min)}'
 
     def __str__(self):
         return f'\n x_min = {self.__x_min} \n x_max = {self.__x_max}\n' \
@@ -570,33 +604,37 @@ def test_unit():
     save_folder = r"D:\全局标定测试"
 
     # # region 测试point类
-    # m_point = point(*[0, 2, 0])
+    # m_point = Point3D(*[0, 2, 0])
     # print('测试print函数：', m_point)
-    # print('测试点加法：', m_point + point(1, 1, 1))
-    # print('测试点减法：', m_point - point(1, 1, 1))
-    # save_point_path = os.path.join(save_folder, 'point.txt')
+    # print('测试点加法：', m_point + Point3D(1, 1, 1))
+    # print('测试点减法：', m_point - Point3D(1, 1, 1))
+    # save_point_path = os.path.join(save_folder, 'Point3D.txt')
     # m_point.save(save_point_path)
     # print(f'测试点保存：{save_point_path}')
     # print('测试点归一化:', m_point.to_norm())
     # # endregion 测试point类
 
     # # region 测试line类
-    # m_line = line()
+    # m_line = Line3D()
     # print('测试print函数：', m_line)
     # print(m_line.direction)
     # print(type(m_line.direction))
+    # save_line_path = os.path.join(save_folder, 'Line3D.txt')
+    # m_line.save(save_line_path)
     # # endregion 测试line类
 
     # # region 测试plane类
-    # m_plane = plane()
+    # m_plane = Plane(xorigin=Point3D(0,0,0),xvector=Point3D(1,-1,0))
     # print('测试print函数：', m_plane)
+    # save_plane_path = os.path.join(save_folder, 'Plane3D.txt')
+    # m_plane.save(save_plane_path)
     # # endregion 测试plane类
 
     # # region 测试sensor类
-    # m_sensor = sensor(x_fix_angle=(0, 0, 1))
+    # m_sensor = Sensor(x_fix_angle=(0, 0, 1))
     # m_sensor.sensor_absolute_move([0, 1, 1])
     # print(m_sensor)
-    # save_point_path = os.path.join(save_folder, 'sensor.txt')
+    # save_point_path = os.path.join(save_folder, 'Sensor.txt')
     # m_sensor.save(save_point_path)
     # # endregion
 
@@ -606,7 +644,7 @@ def test_unit():
     # # endregion
 
     # # region 测试box_2D类
-    # m_box = box_2D(-1, 1, -1, 1)
+    # m_box = Box2D(-1, 1, -1, 1)
     #
     # print(f'盒子的范围为：{m_box}')
     # print(f'盒子的顶点为：{m_box.vertex()}')

@@ -15,7 +15,7 @@ def sensor_scan(x_sensor, x_object):
 
 def machine_scan(x_sensor, x_object, x_path):
     point_result = []
-    assert isinstance(x_sensor, BaseClass.sensor)
+    assert isinstance(x_sensor, BaseClass.Sensor)
     for location in x_path:
         x_sensor.sensor_absolute_move(location)
         point_result.append(sensor_scan(x_sensor, x_object))
@@ -24,9 +24,9 @@ def machine_scan(x_sensor, x_object, x_path):
 
 
 def test_unit():
-    m_sensor = BaseClass.sensor(x_location=(0, 0, 1))
+    m_sensor = BaseClass.Sensor(x_location=(0, 0, 1))
     path = [[0, i * 0.01, 10] for i in range(-100, 100)]
-    result = machine_scan(m_sensor, BaseClass.plane(), path)
+    result = machine_scan(m_sensor, BaseClass.Plane(), path)
     with open(r'D:\全局标定测试\result.txt', 'w') as f:
         for x in result:
             for y in x:
