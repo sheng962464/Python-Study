@@ -223,6 +223,22 @@ def intersection_of_line_and_triangle_slice(x_line, x_triangle_slice):
         return None
 
 
+def is_point_2d_in_polygon_2d(x_point, x_polygon):
+    """
+    判断2D点是否在2D多边形内,返回一个bool值
+    """
+    assert isinstance(x_point,Point2D) and isinstance(len(x_polygon) >= 3)
+    b_ret = False
+    j = len(x_polygon) - 1
+    for i in range(len(x_polygon)):
+        if x_polygon[i].y < x_point.y < x_polygon[j].y or x_polygon[j].y < x_point.y < x_polygon[i].y:
+            if x_point.x > (x_point.y - x_polygon[i].y) * (x_polygon[j].x - x_polygon[i].x) / (
+                    x_polygon[j].y - x_polygon[i].y) + x_polygon[i].x:
+                b_ret = not b_ret
+        j = i
+    return b_ret
+
+
 def test_unit():
     # # region 测试point_rotate()
     # old_point = Point3D(0, 1, 1)
@@ -271,33 +287,33 @@ def test_unit():
     # print(f'总共耗时：{end_time - start_time}s')
     # # endregion
 
-    # region 测试intersection_of_line_and_model
-    m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型-Binary格式.stl')
-    print(f'stl读取结束,共{len(m_model)}个三角面片')
-    list_intersection = []
-    for j in range(-400, 400):
-        '''
-        从(-2, range(-100,100), 20)点发出光线
-        '''
-        for i in range(-800, 800):
-            start_time = time.time()
-            m_line = Line3D(xorigin=Point3D(j * 0.1, i * 0.1, 20), xdirection=Point3D(0, 0, -1))
-            print(f'射线的起点：{m_line.origin}', end=',')
-            temp = intersection_of_line_and_model(m_line, m_model)
-            if temp:
-                list_intersection.append(temp)
-                end_time = time.time()
-                print(f'耗时 {end_time - start_time} s')
-            else:
-                print(f'无交点', end=',')
-                end_time = time.time()
-                print(f'耗时 {end_time - start_time} s')
-
-        m_path = r'D:\全局标定测试\result.txt'
-        with open(m_path, 'w') as f:
-            for x in list_intersection:
-                print(f'{x.x},{x.y},{x.z}\n', file=f)
-    # endregion
+    # # region 测试intersection_of_line_and_model
+    # m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型-Binary格式.stl')
+    # print(f'stl读取结束,共{len(m_model)}个三角面片')
+    # list_intersection = []
+    # for j in range(-400, 400):
+    #     '''
+    #     从(-2, range(-100,100), 20)点发出光线
+    #     '''
+    #     for i in range(-800, 800):
+    #         start_time = time.time()
+    #         m_line = Line3D(xorigin=Point3D(j * 0.1, i * 0.1, 20), xdirection=Point3D(0, 0, -1))
+    #         print(f'射线的起点：{m_line.origin}', end=',')
+    #         temp = intersection_of_line_and_model(m_line, m_model)
+    #         if temp:
+    #             list_intersection.append(temp)
+    #             end_time = time.time()
+    #             print(f'耗时 {end_time - start_time} s')
+    #         else:
+    #             print(f'无交点', end=',')
+    #             end_time = time.time()
+    #             print(f'耗时 {end_time - start_time} s')
+    #
+    #     m_path = r'D:\全局标定测试\result.txt'
+    #     with open(m_path, 'w') as f:
+    #         for x in list_intersection:
+    #             print(f'{x.x},{x.y},{x.z}\n', file=f)
+    # # endregion
 
     # # region 测试intersection_of_line_and_triangle_slice
     # m_line = Line3D(xorigin=Point3D(0.000,99.000,20.000), xdirection=Point3D(0, 0, -1))
