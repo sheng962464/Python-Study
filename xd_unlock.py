@@ -10,18 +10,19 @@ def unlock(x_target_path):
         # files 表示该文件夹下的文件list
         # 遍历文件
         for f in files:
+            # 增加对于后缀的判断
             if f.endswith('.png') or f.endswith('.jpg') or f.endswith('.h') or f.endswith('.cs') or f.endswith('.txt'):
                 index = index + 1
                 file_path = os.path.join(root, f)
                 new_file_name = os.path.splitext(file_path)[0]+'.tx'
                 new_file_path = os.path.join(root, new_file_name)
-
                 print(f'{index:0>5d} 文件:{file_path} ==> {new_file_name}')
 
                 # 在文件名上加引号可以解决空格引起的路径错误问题
                 os.popen(f'copy "{file_path}" "{new_file_path}"')
-                # 需在这里判断一下文件是否复制结束，结束了再开始重命名
+
                 while True:
+                    # 需在这里判断一下文件是否复制结束，结束了再开始重命名
                     if os.path.exists(new_file_path):
                         os.remove(file_path)
                         os.rename(new_file_path, file_path)
