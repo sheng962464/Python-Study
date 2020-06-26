@@ -276,8 +276,8 @@ def test_unit():
 
     # # region 测试is_point_in_triangle_2D()
     # start_time = time.time()
-    # m_point = Point3D(0.1, 0, 2)
-    # m_triangle = Triangle3D(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 1))
+    # m_point = Point3D(0.1, 0.1, 0)
+    # m_triangle = Triangle3D(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 0))
     # m_point_2D = m_point.to_point_2d()
     # m_triangle_2D = m_triangle.to_triangle_2d()
     # print(m_point_2D)
@@ -330,6 +330,21 @@ def test_unit():
     # n_model = model_rotate(m_model, m_matrix)
     # n_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
     # # endregion
+
+    #
+
+    Point_A = Point2D(0,0)
+    Point_B = Point2D(0,1)
+    Point_C = Point2D(1,0)
+
+    Point_D = Point2D(1,-0.1)
+
+    print(cross_multiply_2D(Point_B,Point_D))
+    print(cross_multiply_2D(Point_D,Point_C))
+
+
+
+
     pass
 
 

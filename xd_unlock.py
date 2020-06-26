@@ -31,6 +31,5 @@ def unlock(x_target_path):
 
 
 if __name__ == '__main__':
-    target_path = "E:\\下载\\TestReal_HuaWei-0371538ba5fc6e91f6941f6d600802a517be944f"
+    target_path = "D:\\unlock"
     unlock(target_path)
-    print('success!!!')

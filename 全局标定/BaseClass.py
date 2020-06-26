@@ -528,6 +528,11 @@ class STLModel:
         return '三角面片显示结束'
 
     def save(self, x_path):
+        """
+        使用ASCII格式保存三角化模型
+        @param x_path: 保存路径
+        @return:
+        """
         with open(x_path, 'w') as f:
             print('solid Mesh', file=f)
             for x in self.__tri_list:
@@ -539,7 +544,7 @@ class STLModel:
                 print(f'endloop', file=f)
                 print(f'endfacet', file=f)
             print('endsolid Mesh', file=f)
-        print('STL文件保存结束：成功')
+        print('STL(ASCII)文件保存结束：成功')
         return
 
     def model_init(self):
@@ -688,7 +693,7 @@ def test_unit():
     # # endregion 测试line类
 
     # # region 测试plane类
-    # m_plane = Plane(xorigin=Point3D(0,0,0),xvector=Point3D(1,-1,0))
+    # m_plane = Plane(xorigin=Point3D(0, 0, 0), xvector=Point3D(0, 0, 1))
     # print('测试print函数：', m_plane)
     # save_plane_path = os.path.join(save_folder, 'Plane3D.txt')
     # m_plane.save(save_plane_path)
@@ -702,10 +707,11 @@ def test_unit():
     # m_sensor.save(save_point_path)
     # # endregion
 
-    # # region 测试STL类
-    # m_stl_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型.stl')
-    # m_stl_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
-    # # endregion
+    # region 测试STL类
+    m_stl_model = STLModel.read_stl(r'D:\OPPO中框.stl')
+    print(f'共{len(m_stl_model)}个三角面片')
+    m_stl_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
+    # endregion
 
     # # region 测试box_2D类
     # m_triangle_2d = Triangle2D(Point2D(0, 0), Point2D(1, 0), Point2D(0, 1))
@@ -713,11 +719,11 @@ def test_unit():
     # print(f'盒子的范围为：\n{m_box}')
     # # endregion
 
-    # region 测试box_3D类
-    m_triangle_3d = Triangle3D(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 0))
-    m_box = m_triangle_3d.get_box_3d()
-    print(f'盒子的范围为：\n{m_box}')
-    # endregion
+    # # region 测试box_3D类
+    # m_triangle_3d = Triangle3D(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 0))
+    # m_box = m_triangle_3d.get_box_3d()
+    # print(f'盒子的范围为：\n{m_box}')
+    # # endregion
 
 
 if __name__ == '__main__':
