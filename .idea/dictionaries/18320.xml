@@ -1,8 +1,10 @@
 <component name="ProjectDictionaryState">
   <dictionary name="18320">
     <words>
+      <w>aeps</w>
       <w>calib</w>
       <w>dest</w>
+      <w>diag</w>
       <w>endfacet</w>
       <w>endloop</w>
       <w>endsolid</w>
@@ -12,6 +14,9 @@
       <w>snipaste</w>
       <w>sqrt</w>
       <w>toarray</w>
+      <w>tukey</w>
+      <w>vals</w>
+      <w>vecs</w>
       <w>xdirection</w>
       <w>xfixangle</w>
       <w>xline</w>

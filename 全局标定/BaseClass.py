@@ -197,10 +197,11 @@ class Line3D:
     def end_point(self):
         return self.get_point_from_t(100)
 
-    def save(self, x_file_path):
+    def save(self, x_file_path, x_length=1000, x_step=0.1):
         with open(x_file_path, 'w') as f:
-            for i in range(100):
-                m_point = self.get_point_from_t(i)
+            for i in range(x_length):
+                i -= x_length/2
+                m_point = self.get_point_from_t(i*x_step)
                 print(f'{m_point.x},{m_point.y},{m_point.z}', file=f)
 
 
