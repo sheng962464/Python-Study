@@ -2,14 +2,15 @@ import BaseClass
 import numpy as np
 
 FLT_EPSILON = 1.192092896e-07
+DBL_MAX = 1.7976931348623158e+308
 
 
 # 鲁棒拟合直线
-def fit_line_2d_weight_of_dist(x_tuple_of_points, x_count, weights):
+def fit_line_2d_weight_of_dist(x_tuple_of_points, x_count, x_tuple_weights):
     x, y, x2, y2, xy, w = 0, 0, 0, 0, 0, 0
     for i in range(x_count):
         x_point = x_tuple_of_points[i]
-        x_weight = weights[i]
+        x_weight = x_tuple_weights[i]
         x += x_weight * x_point.x
         y += x_weight * x_point.y
         x2 += x_weight * x_point.x ** 2
@@ -26,7 +27,6 @@ def fit_line_2d_weight_of_dist(x_tuple_of_points, x_count, weights):
     dy2 = y2 - y ** 2
     dxy = xy - x * y
     t = np.arctan2(2 * dxy, dx2 - dy2) / 2
-    # 返回起始点与方向向量
     return [np.cos(t), np.sin(t), x, y]
 
 
@@ -101,18 +101,17 @@ def calc_weight_dist_2d(x_tuple_of_points, x_count, x_line, x_weight, x_dist):
 
 
 def fit_line_2d(x_tuple_of_points, x_count, x_dist, x_c, x_reps, x_aeps):
-    assert x_count > 2
     r_delta = x_reps if x_reps != 0 else 1.0
     a_delta = x_aeps if x_aeps != 0 else 0.01
-    min_err = 1e300
-    err = 0
+    min_err, err = DBL_MAX, 0
     _line_prev = [0.0] * 4
     eps = x_count * FLT_EPSILON
     x_w = [0.0] * x_count
     r = [0.0] * x_count
     result_line = None
-
+    # 迭代上限为20次
     for k in range(20):
+
         is_first = True
 
         for i in range(min([2, x_count])):
