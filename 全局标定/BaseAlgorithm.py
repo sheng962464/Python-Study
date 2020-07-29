@@ -8,6 +8,7 @@ epsilon3 = 1e-3
 epsilon5 = 1e-5
 epsilon8 = 1e-8
 
+
 def cross_multiply(x_point1, x_point2):
     """
     | i j k |
@@ -154,7 +155,7 @@ def is_point_in_triangle_2D(x_point, x_triangle_2D):
     """
     assert isinstance(x_point, Point2D) and isinstance(x_triangle_2D, Triangle2D)
 
-    tx, ty = x_point.x,x_point.y
+    tx, ty = x_point.x, x_point.y
     t_box = x_triangle_2D.get_box_2d()
     if not (t_box.x_min <= tx <= t_box.x_max and t_box.y_min <= ty <= t_box.y_max):
         return False
@@ -227,7 +228,7 @@ def is_point_2d_in_polygon_2d(x_point, x_polygon):
     """
     判断2D点是否在2D多边形内,返回一个bool值
     """
-    assert isinstance(x_point,Point2D) and isinstance(len(x_polygon) >= 3)
+    assert isinstance(x_point, Point2D) and isinstance(len(x_polygon) >= 3)
     b_ret = False
     j = len(x_polygon) - 1
     for i in range(len(x_polygon)):
@@ -237,6 +238,14 @@ def is_point_2d_in_polygon_2d(x_point, x_polygon):
                 b_ret = not b_ret
         j = i
     return b_ret
+
+
+def get_average_center(x_list_of_point):
+    sum_point = Point3D(0, 0, 0)
+    for x_point in x_list_of_point:
+        sum_point += x_point
+    nNum = len(x_list_of_point)
+    return Point3D(sum_point.x / nNum, sum_point.y / nNum, sum_point.z / nNum)
 
 
 def test_unit():
@@ -333,17 +342,14 @@ def test_unit():
 
     #
 
-    Point_A = Point2D(0,0)
-    Point_B = Point2D(0,1)
-    Point_C = Point2D(1,0)
+    Point_A = Point2D(0, 0)
+    Point_B = Point2D(0, 1)
+    Point_C = Point2D(1, 0)
 
-    Point_D = Point2D(1,-0.1)
+    Point_D = Point2D(1, -0.1)
 
-    print(cross_multiply_2D(Point_B,Point_D))
-    print(cross_multiply_2D(Point_D,Point_C))
-
-
-
+    print(cross_multiply_2D(Point_B, Point_D))
+    print(cross_multiply_2D(Point_D, Point_C))
 
     pass
 

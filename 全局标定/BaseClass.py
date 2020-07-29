@@ -1,6 +1,7 @@
 import struct
 import numpy as np
 import BaseTransfer
+import random
 from copy import deepcopy
 
 
@@ -200,8 +201,8 @@ class Line3D:
     def save(self, x_file_path, x_length=1000, x_step=0.1):
         with open(x_file_path, 'w') as f:
             for i in range(x_length):
-                i -= x_length/2
-                m_point = self.get_point_from_t(i*x_step)
+                i -= x_length / 2
+                m_point = self.get_point_from_t(i * x_step)
                 print(f'{m_point.x},{m_point.y},{m_point.z}', file=f)
 
 
@@ -225,8 +226,7 @@ class Plane:
             for yy in range(-50, 50):
                 list_of_point.append(Point3D(xx, yy, 0))
         old_vector = Point3D(0, 0, 1)
-        x_theta = np.arccos(
-            np.dot(old_vector.to_array(), self.vector.to_array()) / (old_vector.norm() * self.vector.norm()))
+        x_theta = np.arccos(np.dot(old_vector.to_array(), self.vector.to_array()) / (old_vector.norm() * self.vector.norm()))
         if x_theta < 1e-5:
             with open(x_file_path, 'w') as f:
                 for x_point in list_of_point:
@@ -240,6 +240,27 @@ class Plane:
                 for x_point in list_of_point:
                     new_point_array = np.dot(x_matrix, x_point.to_array()) + self.origin.to_array()
                     print(f'{new_point_array[0]},{new_point_array[1]},{new_point_array[2]}', file=f)
+
+
+class Sphere:
+    def __init__(self, xcenter=Point3D(0, 0, 0), xr=1):
+        self.center = deepcopy(xcenter)
+        self.r = xr
+
+    def __str__(self):
+        return f'center:{self.center},r:{self.r}'
+
+    def save(self, x_file_path):
+        list_of_point = []
+        for i in range(int(10000 * self.r)):
+            xx = random.normalvariate(0, 1)
+            xy = random.normalvariate(0, 1)
+            xz = random.normalvariate(0, 1)
+            xr = (xx * xx + xy * xy + xz * xz) ** (1 / 2)
+            list_of_point.append(Point3D(xx / xr * self.r, xy / xr * self.r, xz / xr * self.r) + self.center)
+        with open(x_file_path, 'w') as f:
+            for x_point in list_of_point:
+                print(f'{x_point.x},{x_point.y},{x_point.z}', file=f)
 
 
 class Sensor:
@@ -700,6 +721,13 @@ def test_unit():
     # m_plane.save(save_plane_path)
     # # endregion 测试plane类
 
+    # region 测试sphere类
+    m_sphere = Sphere(xcenter=Point3D(0, 0, 0), xr=1)
+    print('测试print函数：', m_sphere)
+    save_sphere_path = os.path.join(save_folder, 'Sphere.txt')
+    m_sphere.save(save_sphere_path)
+    # endregion 测试plane类
+
     # # region 测试sensor类
     # m_sensor = Sensor(x_fix_angle=(0, 0, 1))
     # m_sensor.sensor_absolute_move([0, 1, 1])
@@ -708,11 +736,11 @@ def test_unit():
     # m_sensor.save(save_point_path)
     # # endregion
 
-    # region 测试STL类
-    m_stl_model = STLModel.read_stl(r'D:\OPPO中框.stl')
-    print(f'共{len(m_stl_model)}个三角面片')
-    m_stl_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
-    # endregion
+    # # region 测试STL类
+    # m_stl_model = STLModel.read_stl(r'D:\OPPO中框.stl')
+    # print(f'共{len(m_stl_model)}个三角面片')
+    # m_stl_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
+    # # endregion
 
     # # region 测试box_2D类
     # m_triangle_2d = Triangle2D(Point2D(0, 0), Point2D(1, 0), Point2D(0, 1))

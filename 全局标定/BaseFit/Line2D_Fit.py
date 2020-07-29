@@ -5,9 +5,16 @@ FLT_EPSILON = 1.192092896e-07
 DBL_MAX = 1.7976931348623158e+308
 
 
-# 鲁棒拟合直线
 def fit_line_2d_weight_of_dist(x_tuple_of_points, x_count, x_tuple_weights):
+    """
+    带权重的最小二乘法拟合直线
+    @param x_tuple_of_points: 点的集合
+    @param x_count: 点的数量
+    @param x_tuple_weights: 权重集合
+    @return: 返回一个列表，包含一个直线上的点和方向向量
+    """
     x, y, x2, y2, xy, w = 0, 0, 0, 0, 0, 0
+
     for i in range(x_count):
         x_point = x_tuple_of_points[i]
         x_weight = x_tuple_weights[i]
@@ -17,6 +24,7 @@ def fit_line_2d_weight_of_dist(x_tuple_of_points, x_count, x_tuple_weights):
         y2 += x_weight * x_point.y ** 2
         xy += x_weight * x_point.x * x_point.y
         w += x_weight
+
     x /= w
     y /= w
     x2 /= w
@@ -27,10 +35,17 @@ def fit_line_2d_weight_of_dist(x_tuple_of_points, x_count, x_tuple_weights):
     dy2 = y2 - y ** 2
     dxy = xy - x * y
     t = np.arctan2(2 * dxy, dx2 - dy2) / 2
+
     return [np.cos(t), np.sin(t), x, y]
 
 
 def std_deviation(x_d, x_count):
+    """
+    计算标准差
+    @param x_d: 数集
+    @param x_count: 集合的大小
+    @return:
+    """
     assert x_count > 2
     x_dist = x_d[:]
     x_dist.sort()
@@ -43,6 +58,13 @@ def std_deviation(x_d, x_count):
 
 
 def weight_huber(x_d, x_count, x_c):
+    """
+    huber方法计算权重
+    @param x_d:数集
+    @param x_count:集合的大小
+    @param x_c:常数项参数
+    @return:
+    """
     x_w = [0.0] * x_count
     std_dev = std_deviation(x_d, x_count)
     c = 1.345 * std_dev if x_c <= 0 else x_c
@@ -55,6 +77,13 @@ def weight_huber(x_d, x_count, x_c):
 
 
 def weight_tukey(x_d, x_count, x_c):
+    """
+    tukey方法计算权重
+    @param x_d: 数集
+    @param x_count: 集合的大小
+    @param x_c: 常数项参数
+    @return:
+    """
     x_w = [0.0] * x_count
     std_dev = std_deviation(x_d, x_count)
     c = 2 * std_dev if x_c <= 0 else x_c
@@ -69,6 +98,14 @@ def weight_tukey(x_d, x_count, x_c):
 
 
 def calc_dist_2d(x_tuple_of_points, x_count, x_line, x_dist):
+    """
+    计算每个点到直线的距离，不包含权重
+    @param x_tuple_of_points:
+    @param x_count:
+    @param x_line:
+    @param x_dist:
+    @return:
+    """
     px = x_line[2]
     py = x_line[3]
     nx = x_line[1]
@@ -85,6 +122,15 @@ def calc_dist_2d(x_tuple_of_points, x_count, x_line, x_dist):
 
 
 def calc_weight_dist_2d(x_tuple_of_points, x_count, x_line, x_weight, x_dist):
+    """
+    计算每个点到直线的距离，包含权重
+    @param x_tuple_of_points:
+    @param x_count:
+    @param x_line:
+    @param x_weight:
+    @param x_dist:
+    @return:
+    """
     px = x_line[2]
     py = x_line[3]
     nx = x_line[1]
@@ -101,6 +147,16 @@ def calc_weight_dist_2d(x_tuple_of_points, x_count, x_line, x_weight, x_dist):
 
 
 def fit_line_2d(x_tuple_of_points, x_count, x_dist, x_c, x_reps, x_aeps):
+    """
+    拟合2D直线
+    @param x_tuple_of_points:
+    @param x_count:
+    @param x_dist:
+    @param x_c:
+    @param x_reps:
+    @param x_aeps:
+    @return:
+    """
     r_delta = x_reps if x_reps != 0 else 1.0
     a_delta = x_aeps if x_aeps != 0 else 0.01
     min_err, err = DBL_MAX, 0
