@@ -186,6 +186,24 @@ def get_rotate_matrix_from_two_vector(x_vector_old, x_vector_new):
     return BaseTransfer.Rodrigues((x_axis * x_theta).to_array())
 
 
+def subsample_in_mesh(x_model):
+    """
+    在mesh表格上随机采样点
+    该函数存在bug，临时先把思路写下来，后续把点的类优化为继承numpy.array类即可
+    @param x_model:
+    @return:
+    """
+    x_point_list = []
+    for x_triangle_slice in x_model:
+        for i in range(10):
+            x_triangle = x_triangle_slice.vertex
+            a = np.random.uniform()
+            b = np.random.uniform()
+            c = 1 - a - b
+            x_point_list = a * x_triangle.vertex1 + b * x_triangle.vertex2 + c * x_triangle.vertex3
+    return x_point_list
+
+
 def intersection_of_line_and_model(x_line, x_model):
     """
     先把直线的方向向量转到(0,0,-1),计算该旋转矩阵，为axis_to_z_matrix
@@ -300,13 +318,16 @@ def test_unit():
     print(f'stl读取结束,共{triangle_slice_count}个三角面片')
     list_intersection = []
     laser_direction = [0, 0, -1]
-    # 生成二维列表
-    laser_origin = []
-    for j in range(-400, 400):
-        line_origin = []
-        for i in range(-800, 800):
-            line_origin.append([j * 0.1, i * 0.1, 20])
-        laser_origin.append(line_origin)
+    # # 生成二维列表
+    # laser_origin = []
+    # for j in range(-400, 400):
+    #     line_origin = []
+    #     for i in range(-800, 800):
+    #         line_origin.append([j * 0.1, i * 0.1, 20])
+    #     laser_origin.append(line_origin)
+    m_sensor = Sensor()
+    laser_origin = m_sensor.laser_origin
+
     m_index = 0
     start_time = time.time()
     for m in m_model:
@@ -314,15 +335,10 @@ def test_unit():
 
         assert isinstance(m, TriangleSlice)
         box = m.vertex.to_triangle_2d().get_box_2d()
-        first_index_start = int((box.x_min + 40 - 1) / 0.1)
-        first_index_end = int((box.x_max + 40 + 1) / 0.1)
-        second_index_start = int((box.y_min + 80 - 1) / 0.1)
-        second_index_end = int((box.y_max + 80 + 1) / 0.1)
-
-        x_min = laser_origin[first_index_start][second_index_start][0]
-        x_max = laser_origin[first_index_end][second_index_end][0]
-        y_min = laser_origin[first_index_start][second_index_start][1]
-        y_max = laser_origin[first_index_end][second_index_end][1]
+        first_index_start = int((box.x_min + 10) / 0.01)
+        first_index_end = int((box.x_max + 10) / 0.01)
+        second_index_start = int((box.y_min + 0))
+        second_index_end = int((box.y_max + 0))
 
         for i in range(first_index_start, first_index_end):
             for j in range(second_index_start, second_index_end):
@@ -342,28 +358,7 @@ def test_unit():
     with open(m_path, 'w') as f:
         for x in list_intersection:
             print(f'{x.x},{x.y},{x.z}\n', file=f)
-    # for j in range(-30, 30):
-    #     '''
-    #     从(-2, range(-100,100), 20)点发出光线
-    #     '''
-    #     for i in range(-80, 80):
-    #         start_time = time.time()
-    #         m_line = Line3D(xorigin=Point3D(j * 1, i * 1, 20), xdirection=Point3D(0, 0, -1))
-    #         print(f'射线的起点：{m_line.origin}', end=',')
-    #         temp = intersection_of_line_and_model(m_line, m_model)
-    #         if temp:
-    #             list_intersection.append(temp)
-    #             end_time = time.time()
-    #             print(f'耗时 {end_time - start_time} s')
-    #         else:
-    #             print(f'无交点', end=',')
-    #             end_time = time.time()
-    #             print(f'耗时 {end_time - start_time} s')
-    #
-    #     m_path = r'D:\全局标定测试\result.txt'
-    #     with open(m_path, 'w') as f:
-    #         for x in list_intersection:
-    #             print(f'{x.x},{x.y},{x.z}\n', file=f)
+
     # endregion
 
     # # region 测试intersection_of_line_and_triangle_slice

@@ -275,13 +275,14 @@ class Sensor:
     3. 包含光线的点间距，点数，线距，线数
     """
 
-    def __init__(self, x_point_num=1000, x_point_interval=0.01, x_fix_angle=(0, 0, 0), x_location=(0, 0, 0)):
+    def __init__(self, x_point_num=2000, x_point_interval=0.01, x_fix_angle=(0, 0, 0), x_location=(0, 0, 0)):
         self.__pointNum = x_point_num
         self.__pointInterval = x_point_interval
         self.__fixAngle = x_fix_angle
         self.__location = np.array(x_location)
         self.__laser_vector = [0, 0, -1]
 
+        self.laser_origin = []
         self.laser = None
         self.sensor_calculation()
 
@@ -289,6 +290,7 @@ class Sensor:
         self.__laser_vector = np.dot(BaseTransfer.euler_angle_to_matrix(self.__fixAngle), np.array(self.__laser_vector))
         temp_trig_point = [self.__location + np.array([i * self.__pointInterval, 0, 0])
                            for i in range(-self.__pointNum // 2, self.__pointNum // 2)]
+        self.laser_origin = temp_trig_point
         self.laser = [Line3D(xorigin=Point3D(*x), xdirection=Point3D(*self.__laser_vector)) for x in temp_trig_point]
 
     def sensor_absolute_move(self, x_location):
@@ -727,20 +729,20 @@ def test_unit():
     # m_plane.save(save_plane_path)
     # # endregion 测试plane类
 
-    # region 测试sphere类
-    m_sphere = Sphere(xcenter=Point3D(0, 0, 0), xr=1)
-    print('测试print函数：', m_sphere)
-    save_sphere_path = os.path.join(save_folder, 'Sphere.txt')
-    m_sphere.save(save_sphere_path)
-    # endregion 测试plane类
+    # # region 测试sphere类
+    # m_sphere = Sphere(xcenter=Point3D(0, 0, 0), xr=1)
+    # print('测试print函数：', m_sphere)
+    # save_sphere_path = os.path.join(save_folder, 'Sphere.txt')
+    # m_sphere.save(save_sphere_path)
+    # # endregion 测试plane类
 
-    # # region 测试sensor类
-    # m_sensor = Sensor(x_fix_angle=(0, 0, 1))
-    # m_sensor.sensor_absolute_move([0, 1, 1])
-    # print(m_sensor)
-    # save_point_path = os.path.join(save_folder, 'Sensor.txt')
-    # m_sensor.save(save_point_path)
-    # # endregion
+    # region 测试sensor类
+    m_sensor = Sensor(x_fix_angle=(0, 0, 1))
+    m_sensor.sensor_absolute_move([0, 1, 1])
+    print(m_sensor)
+    save_point_path = os.path.join(save_folder, 'Sensor.txt')
+    m_sensor.save(save_point_path)
+    # endregion
 
     # # region 测试STL类
     # m_stl_model = STLModel.read_stl(r'D:\OPPO中框.stl')
