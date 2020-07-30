@@ -155,10 +155,10 @@ def is_point_in_triangle_2D(x_point, x_triangle_2D):
     """
     assert isinstance(x_point, Point2D) and isinstance(x_triangle_2D, Triangle2D)
 
-    tx, ty = x_point.x, x_point.y
-    t_box = x_triangle_2D.get_box_2d()
-    if not (t_box.x_min <= tx <= t_box.x_max and t_box.y_min <= ty <= t_box.y_max):
-        return False
+    # tx, ty = x_point.x, x_point.y
+    # t_box = x_triangle_2D.get_box_2d()
+    # if not (t_box.x_min <= tx <= t_box.x_max and t_box.y_min <= ty <= t_box.y_max):
+    #     return False
 
     PA = x_triangle_2D.vertex1 - x_point
     PB = x_triangle_2D.vertex2 - x_point
@@ -196,12 +196,10 @@ def intersection_of_line_and_model(x_line, x_model):
     """
     assert isinstance(x_line, Line3D) and isinstance(x_model, STLModel)
 
-    # matrix_line_to_z = get_rotate_matrix_from_two_vector(x_line.direction, Point3D(0, 0, -1))
-    # temp_model = model_rotate(x_model, matrix_line_to_z)
+    matrix_line_to_z = get_rotate_matrix_from_two_vector(x_line.direction, Point3D(0, 0, -1))
+    temp_model = model_rotate(x_model, matrix_line_to_z)
 
-    i = 0
     for x_triangle_slice in x_model:
-        i = i + 1
         temp = intersection_of_line_and_triangle_slice(x_line, x_triangle_slice)
         if temp:
             triangle_slice_model = STLModel([x_triangle_slice])
@@ -296,17 +294,61 @@ def test_unit():
     # print(f'总共耗时：{end_time - start_time}s')
     # # endregion
 
-    # # region 测试intersection_of_line_and_model
-    # m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型-Binary格式.stl')
-    # print(f'stl读取结束,共{len(m_model)}个三角面片')
-    # list_intersection = []
-    # for j in range(-400, 400):
+    # region 测试intersection_of_line_and_model
+    m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型-Binary格式.stl')
+    triangle_slice_count = len(m_model)
+    print(f'stl读取结束,共{triangle_slice_count}个三角面片')
+    list_intersection = []
+    laser_direction = [0, 0, -1]
+    # 生成二维列表
+    laser_origin = []
+    for j in range(-400, 400):
+        line_origin = []
+        for i in range(-800, 800):
+            line_origin.append([j * 0.1, i * 0.1, 20])
+        laser_origin.append(line_origin)
+    m_index = 0
+    start_time = time.time()
+    for m in m_model:
+        m_index += 1
+
+        assert isinstance(m, TriangleSlice)
+        box = m.vertex.to_triangle_2d().get_box_2d()
+        first_index_start = int((box.x_min + 40 - 1) / 0.1)
+        first_index_end = int((box.x_max + 40 + 1) / 0.1)
+        second_index_start = int((box.y_min + 80 - 1) / 0.1)
+        second_index_end = int((box.y_max + 80 + 1) / 0.1)
+
+        x_min = laser_origin[first_index_start][second_index_start][0]
+        x_max = laser_origin[first_index_end][second_index_end][0]
+        y_min = laser_origin[first_index_start][second_index_start][1]
+        y_max = laser_origin[first_index_end][second_index_end][1]
+
+        for i in range(first_index_start, first_index_end):
+            for j in range(second_index_start, second_index_end):
+
+                m_line = Line3D(xorigin=Point3D(*laser_origin[i][j]), xdirection=Point3D(0, 0, -1))
+                temp = intersection_of_line_and_triangle_slice(m_line, m)
+                if temp:
+                    list_intersection.append(temp)
+                else:
+                    pass
+
+        print(f'{m_index}/{triangle_slice_count} ### {m_index / triangle_slice_count:.2%}结束')
+    end_time = time.time()
+    print(f'总共耗时 {end_time - start_time} 秒')
+
+    m_path = r'D:\全局标定测试\result1.txt'
+    with open(m_path, 'w') as f:
+        for x in list_intersection:
+            print(f'{x.x},{x.y},{x.z}\n', file=f)
+    # for j in range(-30, 30):
     #     '''
     #     从(-2, range(-100,100), 20)点发出光线
     #     '''
-    #     for i in range(-800, 800):
+    #     for i in range(-80, 80):
     #         start_time = time.time()
-    #         m_line = Line3D(xorigin=Point3D(j * 0.1, i * 0.1, 20), xdirection=Point3D(0, 0, -1))
+    #         m_line = Line3D(xorigin=Point3D(j * 1, i * 1, 20), xdirection=Point3D(0, 0, -1))
     #         print(f'射线的起点：{m_line.origin}', end=',')
     #         temp = intersection_of_line_and_model(m_line, m_model)
     #         if temp:
@@ -322,7 +364,7 @@ def test_unit():
     #     with open(m_path, 'w') as f:
     #         for x in list_intersection:
     #             print(f'{x.x},{x.y},{x.z}\n', file=f)
-    # # endregion
+    # endregion
 
     # # region 测试intersection_of_line_and_triangle_slice
     # m_line = Line3D(xorigin=Point3D(0.000,99.000,20.000), xdirection=Point3D(0, 0, -1))
@@ -339,17 +381,6 @@ def test_unit():
     # n_model = model_rotate(m_model, m_matrix)
     # n_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
     # # endregion
-
-    #
-
-    Point_A = Point2D(0, 0)
-    Point_B = Point2D(0, 1)
-    Point_C = Point2D(1, 0)
-
-    Point_D = Point2D(1, -0.1)
-
-    print(cross_multiply_2D(Point_B, Point_D))
-    print(cross_multiply_2D(Point_D, Point_C))
 
     pass
 

@@ -267,9 +267,15 @@ class Sensor:
     """
     传感器的本质为射线的集合
     点数，点间隔，安装角度，安装位置
+
+    2020年7月30日
+    优化传感器类为：
+    1. 包含安装角度，安装位置，包含光线的方向向量
+    2. 包含光线的起始点（生成之后才有）
+    3. 包含光线的点间距，点数，线距，线数
     """
 
-    def __init__(self, x_point_num=1500, x_point_interval=0.001, x_fix_angle=(0, 0, 0), x_location=(0, 0, 0)):
+    def __init__(self, x_point_num=1000, x_point_interval=0.01, x_fix_angle=(0, 0, 0), x_location=(0, 0, 0)):
         self.__pointNum = x_point_num
         self.__pointInterval = x_point_interval
         self.__fixAngle = x_fix_angle
