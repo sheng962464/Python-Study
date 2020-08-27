@@ -266,43 +266,43 @@ def get_average_center(x_list_of_point):
 
 def test_unit():
     # # region 测试point_rotate()
-    # old_point = Point3D(0, 1, 1)
+    # old_point = POINT3D(0, 1, 1)
     # m_matrix = BaseTransfer.euler_angle_to_matrix((-90, 0, 0))
-    # new_point = point_rotate(old_point, m_matrix,Point3D(0,1,0))
+    # new_point = point_rotate(old_point, m_matrix,POINT3D(0,1,0))
     # print(new_point)
     # # endregion
 
     # # region 测试line_rotate()
-    # old_line = Line3D(xorigin=Point3D(0,0,1),xdirection=Point3D(0,0,1))
+    # old_line = LINE2D(xorigin=POINT3D(0,0,1),xdirection=POINT3D(0,0,1))
     # m_matrix = BaseTransfer.euler_angle_to_matrix((-90, 0, 0))
-    # new_line = line_rotate(old_line,m_matrix,Point3D(0,0,1))
+    # new_line = line_rotate(old_line,m_matrix,POINT3D(0,0,1))
     # print(new_line)
     # # endregion
 
     # # region 测试plane_rotate()
-    # old_plane = Plane(Point3D(0,1,0),Point3D(0,0,1))
+    # old_plane = Plane(POINT3D(0,1,0),POINT3D(0,0,1))
     # m_matrix = BaseTransfer.euler_angle_to_matrix((-90, 0, 0))
-    # new_plane = plane_rotate(old_plane,m_matrix,Point3D(0,0,0))
+    # new_plane = plane_rotate(old_plane,m_matrix,POINT3D(0,0,0))
     # print(new_plane)
     # # endregion
 
     # # region 叉乘测试
-    # m_point1 = Point3D(1, 22, 0)
-    # m_point2 = Point3D(3, 1, 0)
+    # m_point1 = POINT3D(1, 22, 0)
+    # m_point2 = POINT3D(3, 1, 0)
     # print(cross_multiply(m_point1, m_point2))
     # print(dot_multiply(m_point1, m_point2))
     # # endregion
 
     # # region 测试get_rotate_matrix_from_two_vector
-    # m_vector1 = Point3D(0, 0, 1)
-    # m_vector2 = Point3D(0, 0, 1)
+    # m_vector1 = POINT3D(0, 0, 1)
+    # m_vector2 = POINT3D(0, 0, 1)
     # print(get_rotate_matrix_from_two_vector(m_vector1, m_vector2))
     # # endregion
 
     # # region 测试is_point_in_triangle_2D()
     # start_time = time.time()
-    # m_point = Point3D(0.1, 0.1, 0)
-    # m_triangle = Triangle3D(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 0))
+    # m_point = POINT3D(0.1, 0.1, 0)
+    # m_triangle = Triangle3D(POINT3D(0, 0, 0), POINT3D(1, 0, 0), POINT3D(0, 1, 0))
     # m_point_2D = m_point.to_point_2d()
     # m_triangle_2D = m_triangle.to_triangle_2d()
     # print(m_point_2D)
@@ -362,11 +362,11 @@ def test_unit():
     # endregion
 
     # # region 测试intersection_of_line_and_triangle_slice
-    # m_line = Line3D(xorigin=Point3D(0.000,99.000,20.000), xdirection=Point3D(0, 0, -1))
+    # m_line = LINE2D(xorigin=POINT3D(0.000,99.000,20.000), xdirection=POINT3D(0, 0, -1))
     # m_triangle_slice = TriangleSlice(x_facet=(0.000,0.000,0.024),
-    #                                   x_vertex=Triangle3D(Point3D(-0.000,43.307,-4.210),
-    #                                                     Point3D(-0.012,43.282,-4.210),
-    #                                                     Point3D(-0.000,41.300,-4.210)))
+    #                                   x_vertex=Triangle3D(POINT3D(-0.000,43.307,-4.210),
+    #                                                     POINT3D(-0.012,43.282,-4.210),
+    #                                                     POINT3D(-0.000,41.300,-4.210)))
     # print(intersection_of_line_and_triangle_slice(m_line,m_triangle_slice))
     # # endregion
 

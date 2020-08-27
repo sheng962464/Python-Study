@@ -49,5 +49,14 @@ def test_np_svd():
     print(f"验证A == u*s*vh:{np.allclose(A, np.dot(u, np.dot(s_diag, vh)))}")
 
 
+def test_is_rotate_matrix():
+    A = np.array([[1, 0.1, 0.2],
+                  [-0.1, 1, -0.3],
+                  [-0.2, 0.3, 1]])
+    print(A.T)
+    print(A.transpose())
+    print(np.linalg.inv(A))
+
+
 if __name__ == '__main__':
-    test_np_eig()
+    test_is_rotate_matrix()

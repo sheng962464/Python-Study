@@ -75,7 +75,7 @@ def set_subplot():
     ax1.legend(loc='upper left')  # 显示图例,plt.legend()
     ax1.text(2.8, 7, r'y=3*x')  # 指定位置显示文字,plt.text()
     # 添加标注，参数：注释文本、指向点、文字位置、箭头属性
-    ax1.annotate('important Point3D', xy=(2, 6), xytext=(3, 1.5), arrowprops=dict(facecolor='black', shrink=0.05), )
+    ax1.annotate('important POINT3D', xy=(2, 6), xytext=(3, 1.5), arrowprops=dict(facecolor='black', shrink=0.05), )
 
     # 显示网格。which参数的值为major(只绘制大刻度)、minor(只绘制小刻度)、both，默认值为major。axis为'x','y','both'
     ax1.grid(b=True, which='major', axis='both', alpha=0.5, color='skyblue', linestyle='--', linewidth=2)

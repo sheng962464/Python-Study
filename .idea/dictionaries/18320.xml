@@ -8,9 +8,11 @@
       <w>endfacet</w>
       <w>endloop</w>
       <w>endsolid</w>
+      <w>itheta</w>
       <w>mspaint</w>
       <w>octree</w>
       <w>popen</w>
+      <w>rodrigues</w>
       <w>snipaste</w>
       <w>sqrt</w>
       <w>toarray</w>

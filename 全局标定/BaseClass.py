@@ -703,34 +703,34 @@ def test_unit():
     save_folder = r"D:\全局标定测试"
 
     # # region 测试point类
-    # m_point = Point3D(*[0, 2, 0])
+    # m_point = POINT3D(*[0, 2, 0])
     # print('测试print函数：', m_point)
-    # print('测试点加法：', m_point + Point3D(1, 1, 1))
-    # print('测试点减法：', m_point - Point3D(1, 1, 1))
-    # save_point_path = os.path.join(save_folder, 'Point3D.txt')
+    # print('测试点加法：', m_point + POINT3D(1, 1, 1))
+    # print('测试点减法：', m_point - POINT3D(1, 1, 1))
+    # save_point_path = os.path.join(save_folder, 'POINT3D.txt')
     # m_point.save(save_point_path)
     # print(f'测试点保存：{save_point_path}')
     # print('测试点归一化:', m_point.to_norm())
     # # endregion 测试point类
 
     # # region 测试line类
-    # m_line = Line3D()
+    # m_line = LINE2D()
     # print('测试print函数：', m_line)
     # print(m_line.direction)
     # print(type(m_line.direction))
-    # save_line_path = os.path.join(save_folder, 'Line3D.txt')
+    # save_line_path = os.path.join(save_folder, 'LINE2D.txt')
     # m_line.save(save_line_path)
     # # endregion 测试line类
 
     # # region 测试plane类
-    # m_plane = Plane(xorigin=Point3D(0, 0, 0), xvector=Point3D(0, 0, 1))
+    # m_plane = Plane(xorigin=POINT3D(0, 0, 0), xvector=POINT3D(0, 0, 1))
     # print('测试print函数：', m_plane)
     # save_plane_path = os.path.join(save_folder, 'Plane3D.txt')
     # m_plane.save(save_plane_path)
     # # endregion 测试plane类
 
     # # region 测试sphere类
-    # m_sphere = Sphere(xcenter=Point3D(0, 0, 0), xr=1)
+    # m_sphere = Sphere(xcenter=POINT3D(0, 0, 0), xr=1)
     # print('测试print函数：', m_sphere)
     # save_sphere_path = os.path.join(save_folder, 'Sphere.txt')
     # m_sphere.save(save_sphere_path)
@@ -751,13 +751,13 @@ def test_unit():
     # # endregion
 
     # # region 测试box_2D类
-    # m_triangle_2d = Triangle2D(Point2D(0, 0), Point2D(1, 0), Point2D(0, 1))
+    # m_triangle_2d = Triangle2D(POINT2D(0, 0), POINT2D(1, 0), POINT2D(0, 1))
     # m_box = m_triangle_2d.get_box_2d()
     # print(f'盒子的范围为：\n{m_box}')
     # # endregion
 
     # # region 测试box_3D类
-    # m_triangle_3d = Triangle3D(Point3D(0, 0, 0), Point3D(1, 0, 0), Point3D(0, 1, 0))
+    # m_triangle_3d = Triangle3D(POINT3D(0, 0, 0), POINT3D(1, 0, 0), POINT3D(0, 1, 0))
     # m_box = m_triangle_3d.get_box_3d()
     # print(f'盒子的范围为：\n{m_box}')
     # # endregion
