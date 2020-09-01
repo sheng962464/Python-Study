@@ -1,6 +1,7 @@
 from BaseClass import *
 import numpy as np
 import time
+import sys
 
 epsilon1 = 1e-1
 epsilon2 = 1e-2
@@ -155,10 +156,10 @@ def is_point_in_triangle_2D(x_point, x_triangle_2D):
     """
     assert isinstance(x_point, Point2D) and isinstance(x_triangle_2D, Triangle2D)
 
-    # tx, ty = x_point.x, x_point.y
-    # t_box = x_triangle_2D.get_box_2d()
-    # if not (t_box.x_min <= tx <= t_box.x_max and t_box.y_min <= ty <= t_box.y_max):
-    #     return False
+    tx, ty = x_point.x, x_point.y
+    t_box = x_triangle_2D.get_box_2d()
+    if not (t_box.x_min <= tx <= t_box.x_max and t_box.y_min <= ty <= t_box.y_max):
+        return False
 
     PA = x_triangle_2D.vertex1 - x_point
     PB = x_triangle_2D.vertex2 - x_point
@@ -167,6 +168,8 @@ def is_point_in_triangle_2D(x_point, x_triangle_2D):
     t2 = cross_multiply_2D(PB, PC)
     t3 = cross_multiply_2D(PC, PA)
     if t1 > 0 and t2 > 0 and t3 > 0 or t1 < 0 and t2 < 0 and t3 < 0:
+        return True
+    elif t1 == 0 or t2 == 0 or t3 == 0:
         return True
     else:
         return False
@@ -244,7 +247,7 @@ def is_point_2d_in_polygon_2d(x_point, x_polygon):
     """
     判断2D点是否在2D多边形内,返回一个bool值
     """
-    assert isinstance(x_point, Point2D) and isinstance(len(x_polygon) >= 3)
+    assert isinstance(x_point, Point2D) and len(x_polygon) >= 3
     b_ret = False
     j = len(x_polygon) - 1
     for i in range(len(x_polygon)):
@@ -262,6 +265,81 @@ def get_average_center(x_list_of_point):
         sum_point += x_point
     nNum = len(x_list_of_point)
     return Point3D(sum_point.x / nNum, sum_point.y / nNum, sum_point.z / nNum)
+
+
+def get_intersection_of_two_box_2d(x_box_1: Box2D, x_box_2: Box2D):
+    new_x_min = max([x_box_1.x_min, x_box_2.x_min])
+    new_x_max = min([x_box_1.x_max, x_box_2.x_max])
+    new_y_min = max([x_box_1.y_min, x_box_2.y_min])
+    new_y_max = min([x_box_1.y_max, x_box_2.y_max])
+    if new_x_min >= new_x_max or new_y_min >= new_y_max:
+        # 无交集
+        return Box2D(-1, -1, -1, -1)
+    else:
+        return Box2D(new_x_min, new_x_max, new_y_min, new_y_max)
+
+
+def is_box_2d_exist(x_box: Box2D):
+    if (x_box.x_min == -1.0) and (x_box.x_max == -1.0) and (x_box.y_min == -1.0) and (x_box.y_max == -1.0):
+        return False
+    return True
+
+
+def intersection_of_sensor_laser_and_model(x_sensor: Sensor, x_model: STLModel):
+    """
+    优化计算方式，先提前计算好所有激光的起始点与方向，然后遍历模型中的三角面片，计算三角面片范围中的激光线，求交点
+    @return:
+    """
+    print(f'仿真正在进行中：')
+    x_list_intersection = []
+    triangle_slice_count = len(x_model)
+    # 计算所有的激光的起始点
+    x_laser_origin = temp_laser_origin()
+    temp_x = [x_index * 0.01 for x_index in range(int(x_laser_origin[0][0][0] * 100), int(x_laser_origin[0][-1][0] * 100))]
+    temp_y = [y_index * 0.1 for y_index in range(int(x_laser_origin[0][0][1] * 10), int(x_laser_origin[-1][0][1] * 10))]
+
+    for x_triangle_index, x_triangle in enumerate(x_model):
+        assert isinstance(x_triangle, TriangleSlice)
+        x_box = x_triangle.vertex.to_triangle_2d().get_box_2d()
+        # 增加判断
+        x_intersection_box = get_intersection_of_two_box_2d(x_box, Box2D(temp_x[0], temp_x[-1], temp_y[0], temp_y[-1]))
+        if is_box_2d_exist(x_intersection_box):
+            first_index_start = int((round(x_intersection_box.x_min, 2) - temp_x[0]) * 100)
+            first_index_end = int((round(x_intersection_box.x_max, 2) - temp_x[0]) * 100 + 2)
+            second_index_start = int((round(x_intersection_box.y_min, 1) - temp_y[0]) * 10)
+            second_index_end = int((round(x_intersection_box.y_max, 1) - temp_y[0]) * 10 + 2)
+
+            for i in range(first_index_start, first_index_end):
+                for j in range(second_index_start, second_index_end):
+
+                    m_line = Line3D(xorigin=Point3D(*x_laser_origin[j][i]), xdirection=Point3D(0, 0, -1))
+                    temp = intersection_of_line_and_triangle_slice(m_line, x_triangle)
+                    if temp:
+                        x_list_intersection.append(temp)
+                    else:
+                        pass
+            # 刷新控制台进度条
+            sys.stdout.write(f'\r{"█" * round(x_triangle_index / triangle_slice_count * 100)}'
+                             f'{x_triangle_index / triangle_slice_count:.2%}结束'
+                             f'{"." * (100 - round(x_triangle_index / triangle_slice_count * 100))} '
+                             f'已有{len(x_list_intersection)}个点')
+        else:
+            continue
+    return x_list_intersection
+
+
+def temp_laser_origin():
+    """
+    用于临时获得激光的起始点，因为传感器代码还没写好
+    @return:
+    """
+    x_laser_origin = []
+    for i in range(-60, 60):
+        x_line_origin = []
+        for j in range(-600, 600):
+            x_line_origin.append([j * 0.01, i * 0.1, 20])
+        x_laser_origin.append(x_line_origin)
+    return x_laser_origin
 
 
 def test_unit():
@@ -311,22 +389,21 @@ def test_unit():
     # end_time = time.time()
     # print(f'总共耗时：{end_time - start_time}s')
     # # endregion
-
     # region 测试intersection_of_line_and_model
-    m_model = STLModel.read_stl(r'D:\全局标定测试\单层NEY模型-Binary格式.stl')
+    m_model = STLModel.read_stl(r'D:\全局标定测试\sphere_R5.stl')
     triangle_slice_count = len(m_model)
     print(f'stl读取结束,共{triangle_slice_count}个三角面片')
     list_intersection = []
     laser_direction = [0, 0, -1]
-    # # 生成二维列表
-    # laser_origin = []
-    # for j in range(-400, 400):
-    #     line_origin = []
-    #     for i in range(-800, 800):
-    #         line_origin.append([j * 0.1, i * 0.1, 20])
-    #     laser_origin.append(line_origin)
-    m_sensor = Sensor()
-    laser_origin = m_sensor.laser_origin
+    # 生成二维列表
+    laser_origin = []
+    for j in range(-600, 600):
+        line_origin = []
+        for i in range(-60, 60):
+            line_origin.append([j * 0.01, i * 0.1, 20])
+        laser_origin.append(line_origin)
+    # m_sensor = Sensor()
+    # laser_origin = m_sensor.laser_origin
 
     m_index = 0
     start_time = time.time()
@@ -335,11 +412,10 @@ def test_unit():
 
         assert isinstance(m, TriangleSlice)
         box = m.vertex.to_triangle_2d().get_box_2d()
-        first_index_start = int((box.x_min + 10) / 0.01)
-        first_index_end = int((box.x_max + 10) / 0.01)
-        second_index_start = int((box.y_min + 0))
-        second_index_end = int((box.y_max + 0))
-
+        first_index_start = int((box.x_min + 6) / 0.01 - 5)
+        first_index_end = int((box.x_max + 6) / 0.01 + 5)
+        second_index_start = int((box.y_min + 6) / 0.1 - 5)
+        second_index_end = int((box.y_max + 6) / 0.1 + 5)
         for i in range(first_index_start, first_index_end):
             for j in range(second_index_start, second_index_end):
 
@@ -349,12 +425,11 @@ def test_unit():
                     list_intersection.append(temp)
                 else:
                     pass
-
-        print(f'{m_index}/{triangle_slice_count} ### {m_index / triangle_slice_count:.2%}结束')
+        print(f'{m_index}/{triangle_slice_count} ### {m_index / triangle_slice_count:.2%}结束，已有{len(list_intersection)}个点')
     end_time = time.time()
     print(f'总共耗时 {end_time - start_time} 秒')
 
-    m_path = r'D:\全局标定测试\result1.txt'
+    m_path = r'D:\全局标定测试\result-sphere.txt'
     with open(m_path, 'w') as f:
         for x in list_intersection:
             print(f'{x.x},{x.y},{x.z}\n', file=f)
@@ -381,4 +456,10 @@ def test_unit():
 
 
 if __name__ == '__main__':
-    test_unit()
+    m_model = STLModel.read_stl(r'D:\全局标定测试\sphere_R5.stl')
+    list_intersection = intersection_of_sensor_laser_and_model(Sensor(), m_model)
+
+    m_path = r'D:\全局标定测试\result-sphere.txt'
+    with open(m_path, 'w') as f:
+        for x in list_intersection:
+            print(f'{x.x},{x.y},{x.z}\n', file=f)
