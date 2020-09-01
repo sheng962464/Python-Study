@@ -25,7 +25,7 @@ def cross_multiply(x_point1, x_point2):
     return Point3D(b1 * c2 - b2 * c1, c1 * a2 - a1 * c2, a1 * b2 - a2 * b1).to_norm()
 
 
-def cross_multiply_2D(x_point1, x_point2):
+def cross_multiply_2d(x_point1, x_point2):
     """
     | i j k |
 　　|a1 b1 c1|
@@ -139,11 +139,11 @@ def model_rotate(x_model, x_matrix, x_center=Point3D(0, 0, 0)):
     return STLModel(triangle_list)
 
 
-def is_point_in_triangle_3D(x_point, x_triangle):
+def is_point_in_triangle_3d(x_point, x_triangle):
     pass
 
 
-def is_point_in_triangle_2D(x_point, x_triangle_2D):
+def is_point_in_triangle_2d(x_point, x_triangle_2d):
     """
     判断平面上的点是否在三角形内
     算法原理使用向量的叉乘。假设三角形的三个点按照顺时针顺序为A,B,C
@@ -154,19 +154,19 @@ def is_point_in_triangle_2D(x_point, x_triangle_2D):
     如果t1,t2,t3同号，则P在三角形内部，否则在外部
     如果t1*t2*t3 = 0，则表示该点在三角形的边界
     """
-    assert isinstance(x_point, Point2D) and isinstance(x_triangle_2D, Triangle2D)
+    assert isinstance(x_point, Point2D) and isinstance(x_triangle_2d, Triangle2D)
 
     tx, ty = x_point.x, x_point.y
-    t_box = x_triangle_2D.get_box_2d()
+    t_box = x_triangle_2d.get_box_2d()
     if not (t_box.x_min <= tx <= t_box.x_max and t_box.y_min <= ty <= t_box.y_max):
         return False
 
-    PA = x_triangle_2D.vertex1 - x_point
-    PB = x_triangle_2D.vertex2 - x_point
-    PC = x_triangle_2D.vertex3 - x_point
-    t1 = cross_multiply_2D(PA, PB)
-    t2 = cross_multiply_2D(PB, PC)
-    t3 = cross_multiply_2D(PC, PA)
+    PA = x_triangle_2d.vertex1 - x_point
+    PB = x_triangle_2d.vertex2 - x_point
+    PC = x_triangle_2d.vertex3 - x_point
+    t1 = cross_multiply_2d(PA, PB)
+    t2 = cross_multiply_2d(PB, PC)
+    t3 = cross_multiply_2d(PC, PA)
     if t1 > 0 and t2 > 0 and t3 > 0 or t1 < 0 and t2 < 0 and t3 < 0:
         return True
     elif t1 == 0 or t2 == 0 or t3 == 0:
@@ -220,10 +220,10 @@ def intersection_of_line_and_model(x_line, x_model):
     matrix_line_to_z = get_rotate_matrix_from_two_vector(x_line.direction, Point3D(0, 0, -1))
     temp_model = model_rotate(x_model, matrix_line_to_z)
 
-    for x_triangle_slice in x_model:
+    for x_triangle_slice in temp_model:
         temp = intersection_of_line_and_triangle_slice(x_line, x_triangle_slice)
         if temp:
-            triangle_slice_model = STLModel([x_triangle_slice])
+            # triangle_slice_model = STLModel([x_triangle_slice])
             return temp
 
 
@@ -232,7 +232,7 @@ def intersection_of_line_and_triangle_slice(x_line, x_triangle_slice):
     直线的方向为(0,0,-1),与三角面片计算交点
     """
     assert isinstance(x_line, Line3D) and isinstance(x_triangle_slice, TriangleSlice)
-    if is_point_in_triangle_2D(x_line.origin.to_point_2d(), x_triangle_slice.vertex.to_triangle_2d()):
+    if is_point_in_triangle_2d(x_line.origin.to_point_2d(), x_triangle_slice.vertex.to_triangle_2d()):
         x_plane = create_plane_from_3point(x_triangle_slice.vertex.vertex1,
                                            x_triangle_slice.vertex.vertex2,
                                            x_triangle_slice.vertex.vertex3)
@@ -263,8 +263,8 @@ def get_average_center(x_list_of_point):
     sum_point = Point3D(0, 0, 0)
     for x_point in x_list_of_point:
         sum_point += x_point
-    nNum = len(x_list_of_point)
-    return Point3D(sum_point.x / nNum, sum_point.y / nNum, sum_point.z / nNum)
+    count = len(x_list_of_point)
+    return Point3D(sum_point.x / count, sum_point.y / count, sum_point.z / count)
 
 
 def get_intersection_of_two_box_2d(x_box_1: Box2D, x_box_2: Box2D):
@@ -385,56 +385,10 @@ def test_unit():
     # m_triangle_2D = m_triangle.to_triangle_2d()
     # print(m_point_2D)
     # print(m_triangle_2D)
-    # print(is_point_in_triangle_2D(m_point_2D, m_triangle_2D))
+    # print(is_point_in_triangle_2d(m_point_2D, m_triangle_2D))
     # end_time = time.time()
     # print(f'总共耗时：{end_time - start_time}s')
     # # endregion
-    # region 测试intersection_of_line_and_model
-    m_model = STLModel.read_stl(r'D:\全局标定测试\sphere_R5.stl')
-    triangle_slice_count = len(m_model)
-    print(f'stl读取结束,共{triangle_slice_count}个三角面片')
-    list_intersection = []
-    laser_direction = [0, 0, -1]
-    # 生成二维列表
-    laser_origin = []
-    for j in range(-600, 600):
-        line_origin = []
-        for i in range(-60, 60):
-            line_origin.append([j * 0.01, i * 0.1, 20])
-        laser_origin.append(line_origin)
-    # m_sensor = Sensor()
-    # laser_origin = m_sensor.laser_origin
-
-    m_index = 0
-    start_time = time.time()
-    for m in m_model:
-        m_index += 1
-
-        assert isinstance(m, TriangleSlice)
-        box = m.vertex.to_triangle_2d().get_box_2d()
-        first_index_start = int((box.x_min + 6) / 0.01 - 5)
-        first_index_end = int((box.x_max + 6) / 0.01 + 5)
-        second_index_start = int((box.y_min + 6) / 0.1 - 5)
-        second_index_end = int((box.y_max + 6) / 0.1 + 5)
-        for i in range(first_index_start, first_index_end):
-            for j in range(second_index_start, second_index_end):
-
-                m_line = Line3D(xorigin=Point3D(*laser_origin[i][j]), xdirection=Point3D(0, 0, -1))
-                temp = intersection_of_line_and_triangle_slice(m_line, m)
-                if temp:
-                    list_intersection.append(temp)
-                else:
-                    pass
-        print(f'{m_index}/{triangle_slice_count} ### {m_index / triangle_slice_count:.2%}结束，已有{len(list_intersection)}个点')
-    end_time = time.time()
-    print(f'总共耗时 {end_time - start_time} 秒')
-
-    m_path = r'D:\全局标定测试\result-sphere.txt'
-    with open(m_path, 'w') as f:
-        for x in list_intersection:
-            print(f'{x.x},{x.y},{x.z}\n', file=f)
-
-    # endregion
 
     # # region 测试intersection_of_line_and_triangle_slice
     # m_line = LINE2D(xorigin=POINT3D(0.000,99.000,20.000), xdirection=POINT3D(0, 0, -1))
