@@ -313,6 +313,28 @@ class Sensor:
         return f'传感器输出结束,共{len(self.laser)}条激光线'
 
 
+class TriggerPath:
+    """
+    触发路径，定义传感器的移动路径，触发间隔
+    """
+
+    def __init__(self, x_start_point: float, x_end_point: float, x_trigger=0.1, x_location=0, x_sensor=Sensor()):
+        # y方向触发
+        self.__start_point = x_start_point
+        self.__end_point = x_end_point
+        self.__trigger = x_trigger
+        self.__sensor = x_sensor
+        self.__location = x_location
+
+    def trigger_calculate(self):
+        x_laser_origin = []
+        # 根据传感器与触发路径生成触发点
+        for i in [x for x in np.arange(self.__start_point, self.__end_point, self.__trigger)]:
+            self.__sensor.sensor_absolute_move([self.__location, i, 20])
+            x_laser_origin.append(self.__sensor.laser_origin)
+        return x_laser_origin
+
+
 class Triangle2D:
     def __init__(self, x_vertex1=Point2D(0, 0), x_vertex2=Point2D(0, 0), x_vertex3=Point2D(0, 0)):
         assert isinstance(x_vertex1, Point2D) and isinstance(x_vertex2, Point2D) and isinstance(x_vertex3, Point2D)

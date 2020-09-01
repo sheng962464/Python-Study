@@ -1,6 +1,5 @@
 from BaseClass import *
 import numpy as np
-import time
 import sys
 
 epsilon1 = 1e-1
@@ -161,12 +160,12 @@ def is_point_in_triangle_2d(x_point, x_triangle_2d):
     if not (t_box.x_min <= tx <= t_box.x_max and t_box.y_min <= ty <= t_box.y_max):
         return False
 
-    PA = x_triangle_2d.vertex1 - x_point
-    PB = x_triangle_2d.vertex2 - x_point
-    PC = x_triangle_2d.vertex3 - x_point
-    t1 = cross_multiply_2d(PA, PB)
-    t2 = cross_multiply_2d(PB, PC)
-    t3 = cross_multiply_2d(PC, PA)
+    pa = x_triangle_2d.vertex1 - x_point
+    pb = x_triangle_2d.vertex2 - x_point
+    pc = x_triangle_2d.vertex3 - x_point
+    t1 = cross_multiply_2d(pa, pb)
+    t2 = cross_multiply_2d(pb, pc)
+    t3 = cross_multiply_2d(pc, pa)
     if t1 > 0 and t2 > 0 and t3 > 0 or t1 < 0 and t2 < 0 and t3 < 0:
         return True
     elif t1 == 0 or t2 == 0 or t3 == 0:
@@ -203,7 +202,7 @@ def subsample_in_mesh(x_model):
             a = np.random.uniform()
             b = np.random.uniform()
             c = 1 - a - b
-            x_point_list = a * x_triangle.vertex1 + b * x_triangle.vertex2 + c * x_triangle.vertex3
+            x_point_list.append(x_triangle.vertex1 * a + x_triangle.vertex2 * b + x_triangle.vertex3 * c)
     return x_point_list
 
 
@@ -334,12 +333,25 @@ def temp_laser_origin():
     @return:
     """
     x_laser_origin = []
-    for i in range(-60, 60):
+    x_start = int(-6 / 0.01)
+    x_end = int(6 / 0.01)
+    y_start = int(-6 / 0.1)
+    y_end = int(6 / 0.1)
+
+    for i in range(y_start, y_end):
         x_line_origin = []
-        for j in range(-600, 600):
+        for j in range(x_start, x_end):
             x_line_origin.append([j * 0.01, i * 0.1, 20])
         x_laser_origin.append(x_line_origin)
     return x_laser_origin
+
+
+def save(x_object, x_file_name):
+    if isinstance(x_object, list):
+        if isinstance(x_object[0], Point3D):
+            with open('D:\\全局标定测试\\' + x_file_name, 'w') as x_f:
+                for x_point in x_object:
+                    print(f'{x_point.x},{x_point.y},{x_point.z}\n', file=x_f)
 
 
 def test_unit():
@@ -406,14 +418,20 @@ def test_unit():
     # n_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
     # # endregion
 
+    # region 测试subsample_in_mesh()
+    t_model = STLModel.read_stl(r'D:\全局标定测试\sphere_R5.stl')
+    list_point = subsample_in_mesh(t_model)
+    save(list_point, 'subsample.txt')
+    # endregion
+
     pass
 
 
-if __name__ == '__main__':
-    m_model = STLModel.read_stl(r'D:\全局标定测试\sphere_R5.stl')
+def simulation_test():
+    m_model = STLModel.read_stl(r'D:\全局标定测试\TuMo.stl')
     list_intersection = intersection_of_sensor_laser_and_model(Sensor(), m_model)
+    save(list_intersection, 'result-TuMo.txt')
 
-    m_path = r'D:\全局标定测试\result-sphere.txt'
-    with open(m_path, 'w') as f:
-        for x in list_intersection:
-            print(f'{x.x},{x.y},{x.z}\n', file=f)
+
+if __name__ == '__main__':
+    simulation_test()
