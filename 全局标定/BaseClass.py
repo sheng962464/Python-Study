@@ -3,6 +3,7 @@ import numpy as np
 import BaseTransfer
 import random
 from copy import deepcopy
+import os
 
 
 class Point3D:
@@ -198,8 +199,8 @@ class Line3D:
     def end_point(self):
         return self.get_point_from_t(100)
 
-    def save(self, x_file_path, x_length=1000, x_step=0.1):
-        with open(x_file_path, 'w') as f:
+    def save(self, x_file_path, x_pattern='w', x_encoding='utf-8', x_length=1000, x_step=0.1):
+        with open(x_file_path, x_pattern, encoding=x_encoding) as f:
             for i in range(x_length):
                 i -= x_length / 2
                 m_point = self.get_point_from_t(i * x_step)
@@ -243,6 +244,10 @@ class Plane:
 
 
 class Sphere:
+    """
+    球的参数方程 (X-A)^2+(Y-B)^2+(Z-C)^2 = R^2
+    """
+
     def __init__(self, xcenter=Point3D(0, 0, 0), xr=1):
         self.center = deepcopy(xcenter)
         self.r = xr
@@ -251,6 +256,11 @@ class Sphere:
         return f'center:{self.center},r:{self.r}'
 
     def save(self, x_file_path):
+        """
+        保存球点云
+        @param x_file_path: 保存路径
+        @return:
+        """
         list_of_point = []
         for i in range(int(10000 * self.r)):
             xx = random.normalvariate(0, 1)
@@ -295,22 +305,32 @@ class Sensor:
 
     def sensor_absolute_move(self, x_location):
         # 绝对移动
-        self.__location = x_location
+        self.__location = np.array(x_location)
         self.sensor_calculation()
         print(f'移动到{self.__location}位置')
 
-    def sensor_relative_move(self):
-        pass
+    def sensor_relative_move(self, x_location):
+        # 相对位移
+        self.__location += np.array(x_location)
+        self.sensor_calculation()
+        print(f'移动到{self.__location}位置')
 
     def save(self, x_path):
-        with open(x_path, 'w') as f:
-            for x in self.laser:
-                print(x, file=f)
+        # 传感器保存(所有的激光线)
+        # 不能直接调用直线的保存，后一条直线会覆盖前一条直线
+        os.remove(x_path)
+        for x in self.laser:
+            assert isinstance(x, Line3D)
+            x.save(x_path, 'a')
+
+    def show_location(self):
+        # 展示当前传感器的位置
+        print(f"当前传感器的位置为: {self.__location}")
 
     def __str__(self):
-        for x in self.laser:
-            print(x)
-        return f'传感器输出结束,共{len(self.laser)}条激光线'
+        return f'传感器共{len(self.laser)}条激光线\n' \
+               f'起点为{self.laser_origin[0]},终点为{self.laser_origin[-1]}\n' \
+               f'点间隔为{self.__pointInterval},点数为{self.__pointNum}\n'
 
 
 class TriggerPath:
@@ -336,6 +356,7 @@ class TriggerPath:
 
 
 class Triangle2D:
+    # 2D三角形类
     def __init__(self, x_vertex1=Point2D(0, 0), x_vertex2=Point2D(0, 0), x_vertex3=Point2D(0, 0)):
         assert isinstance(x_vertex1, Point2D) and isinstance(x_vertex2, Point2D) and isinstance(x_vertex3, Point2D)
         self.__vertex1 = deepcopy(x_vertex1)
@@ -718,6 +739,26 @@ class Box3D:
                f' z_min = {self.__z_min:.3f}    z_max = {self.__z_max:.3f}'
 
 
+class Coordinate3D:
+    def __init__(self, x_axis=Line3D(xdirection=Point3D(1, 0, 0)), y_axis=Line3D(xdirection=Point3D(0, 1, 0)),
+                 z_axis=Line3D(xdirection=Point3D(0, 0, 1))):
+        self.__x_axis = x_axis
+        self.__y_axis = y_axis
+        self.__z_axis = z_axis
+
+    def __str__(self):
+        return f'x轴方向为{self.__x_axis.direction}\n' \
+               f'y轴方向为{self.__y_axis.direction}\n' \
+               f'z轴方向为{self.__z_axis.direction}'
+
+    def save(self, x_file_path):
+        if os.path.exists(x_file_path):
+            os.remove(x_file_path)
+        self.__x_axis.save(x_file_path, 'w')
+        self.__y_axis.save(x_file_path, 'a')
+        self.__z_axis.save(x_file_path, 'a')
+
+
 def test_unit():
     pass
 
@@ -758,13 +799,14 @@ def test_unit():
     # m_sphere.save(save_sphere_path)
     # # endregion 测试plane类
 
-    # region 测试sensor类
-    m_sensor = Sensor(x_fix_angle=(0, 0, 1))
-    m_sensor.sensor_absolute_move([0, 1, 1])
-    print(m_sensor)
-    save_point_path = os.path.join(save_folder, 'Sensor.txt')
-    m_sensor.save(save_point_path)
-    # endregion
+    # # region 测试sensor类
+    # m_sensor = Sensor(x_fix_angle=(0, 0, 1))
+    # m_sensor.sensor_absolute_move([0, 0, 1])
+    # m_sensor.sensor_relative_move([0, 0, 1])
+    # print(m_sensor)
+    # save_point_path = os.path.join(save_folder, 'Sensor.txt')
+    # m_sensor.save(save_point_path)
+    # # endregion
 
     # # region 测试STL类
     # m_stl_model = STLModel.read_stl(r'D:\OPPO中框.stl')
@@ -783,6 +825,13 @@ def test_unit():
     # m_box = m_triangle_3d.get_box_3d()
     # print(f'盒子的范围为：\n{m_box}')
     # # endregion
+
+    # region 测试Coordinate3D类
+    m_coordinate = Coordinate3D()
+    save_point_path = os.path.join(save_folder, 'Coordinate3D.txt')
+    m_coordinate.save(save_point_path)
+    print(m_coordinate)
+    # endregion
 
 
 if __name__ == '__main__':

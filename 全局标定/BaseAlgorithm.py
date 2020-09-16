@@ -267,13 +267,19 @@ def get_average_center(x_list_of_point):
 
 
 def get_intersection_of_two_box_2d(x_box_1: Box2D, x_box_2: Box2D):
+    """
+    获得两个box的重叠区域
+    @param x_box_1:
+    @param x_box_2:
+    @return:
+    """
     new_x_min = max([x_box_1.x_min, x_box_2.x_min])
     new_x_max = min([x_box_1.x_max, x_box_2.x_max])
     new_y_min = max([x_box_1.y_min, x_box_2.y_min])
     new_y_max = min([x_box_1.y_max, x_box_2.y_max])
     if new_x_min >= new_x_max or new_y_min >= new_y_max:
         # 无交集
-        return Box2D(-1, -1, -1, -1)
+        return
     else:
         return Box2D(new_x_min, new_x_max, new_y_min, new_y_max)
 
@@ -302,7 +308,7 @@ def intersection_of_sensor_laser_and_model(x_sensor: Sensor, x_model: STLModel):
         x_box = x_triangle.vertex.to_triangle_2d().get_box_2d()
         # 增加判断
         x_intersection_box = get_intersection_of_two_box_2d(x_box, Box2D(temp_x[0], temp_x[-1], temp_y[0], temp_y[-1]))
-        if is_box_2d_exist(x_intersection_box):
+        if x_intersection_box:
             first_index_start = int((round(x_intersection_box.x_min, 2) - temp_x[0]) * 100)
             first_index_end = int((round(x_intersection_box.x_max, 2) - temp_x[0]) * 100 + 2)
             second_index_start = int((round(x_intersection_box.y_min, 1) - temp_y[0]) * 10)
@@ -333,10 +339,10 @@ def temp_laser_origin():
     @return:
     """
     x_laser_origin = []
-    x_start = int(-6 / 0.01)
-    x_end = int(6 / 0.01)
-    y_start = int(-6 / 0.1)
-    y_end = int(6 / 0.1)
+    x_start = int(-36 / 0.01)
+    x_end = int(36 / 0.01)
+    y_start = int(-80 / 0.1)
+    y_end = int(80 / 0.1)
 
     for i in range(y_start, y_end):
         x_line_origin = []
@@ -351,7 +357,7 @@ def save(x_object, x_file_name):
         if isinstance(x_object[0], Point3D):
             with open('D:\\全局标定测试\\' + x_file_name, 'w') as x_f:
                 for x_point in x_object:
-                    print(f'{x_point.x},{x_point.y},{x_point.z}\n', file=x_f)
+                    print(f'{x_point.x},{x_point.y},{x_point.z}', end="\n", file=x_f)
 
 
 def test_unit():
@@ -428,7 +434,7 @@ def test_unit():
 
 
 def simulation_test():
-    m_model = STLModel.read_stl(r'D:\全局标定测试\TuMo.stl')
+    m_model = STLModel.read_stl(r'D:\单层NEY模型.stl')
     list_intersection = intersection_of_sensor_laser_and_model(Sensor(), m_model)
     save(list_intersection, 'result-TuMo.txt')
 
