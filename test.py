@@ -1,46 +1,34 @@
-class Point3D:
-    def __init__(self, d_x, d_y, d_z):
-        self.x = d_x
-        self.y = d_y
-        self.z = d_z
+def save_point_cloud(x_file, x_list):
+    with open(x_file, 'w', encoding='utf-8') as f:
+        for row in x_list:
+            for point in row:
+                print(f"{point[0]},{point[1]},{point[2]},", end='', file=f)
+                print(f"{point[0]},{point[1]},{point[2]}", end='')
+            print('', file=f)
+            print('')
 
 
-m_matrix = [[],
-            [],
-            [],
-            []]
-
-
-def transfer(d_matrix, d_point):
-    assert isinstance(d_point, Point3D)
-    p_x = d_matrix[0][0] * d_point.x + d_matrix[0][1] * d_point.y + d_matrix[0][2] * d_point.z + d_matrix[0][3]
-    p_y = d_matrix[1][0] * d_point.x + d_matrix[1][1] * d_point.y + d_matrix[1][2] * d_point.z + d_matrix[1][3]
-    p_z = d_matrix[2][0] * d_point.x + d_matrix[2][1] * d_point.y + d_matrix[2][2] * d_point.z + d_matrix[2][3]
-    return Point3D(p_x, p_y, p_z)
-
-
-def test():
+def get_rectangle_point_cloud(sx, sy, sz, width, height):
+    # 左上角为起点，输入起点与大小
+    x_step = 0.01
+    y_step = 0.1
     point_list = []
-    with open('sphere_3.txt', 'r', encoding='utf-8') as f:
-        for point_rows in f.readline():
-            point_lines = []
-            value_list = point_rows.split(',')
-            value_count = len(value_list)
-            for index in range(0, value_count, 3):
-                m_point = Point3D(value_list[index], value_list[index + 1], value_list[index + 2])
-                mt_point = transfer(m_matrix, m_point)
-                point_lines.append(mt_point)
-            point_list.append(point_list)
+    x_num = int(width / x_step)
+    y_num = int(height / y_step)
+    for i in range(y_num):
+        row_point = []
+        for j in range(x_num):
+            row_point.append([sx + j * x_step, sy - i * y_step, sz])
+        point_list.append(row_point)
     return point_list
 
 
-def save(d_point_list, x_file_path):
-    with open(x_file_path, 'w', encoding='utf-8') as f:
-        for point_line in d_point_list:
-            for point in point_line:
-                print(f"{point.x},{point.y},{point.z}", end=',', file=f)
-            print('', end='\n', file=f)
+def gen_point_file(sx, sy, sz, width, height, file_path):
+    save_point_cloud(file_path, get_rectangle_point_cloud(sx, sy, sz, width, height))
 
 
 if __name__ == '__main__':
-    test()
+    gen_point_file(1, 13, 0, 1, 11, '1.tx')
+    gen_point_file(2, 13, 0, 6, 1, '2.tx')
+    gen_point_file(2, 9.5, 0, 6, 1, '3.tx')
+

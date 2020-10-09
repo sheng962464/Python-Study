@@ -360,6 +360,22 @@ def save(x_object, x_file_name):
                     print(f'{x_point.x},{x_point.y},{x_point.z}', end="\n", file=x_f)
 
 
+def is_point_equal(x_point_1, x_point_2):
+    # 判断两个点是否相同
+    assert isinstance(x_point_1, Point3D) and isinstance(x_point_2, Point3D)
+    delta = x_point_1 - x_point_2
+    if delta.x <= epsilon5 and delta.y <= epsilon5 and delta.z < epsilon5:
+        return True
+    return False
+
+
+def distance_from_point_to_plane(x_point, x_plane):
+    assert isinstance(x_point, Point3D) and isinstance(x_plane, Plane)
+    x_normal_vector = x_plane.vector
+    x_point_vector = x_point - x_plane.origin
+    return dot_multiply(x_point_vector, x_normal_vector)
+
+
 def test_unit():
     # # region 测试point_rotate()
     # old_point = POINT3D(0, 1, 1)
@@ -424,10 +440,16 @@ def test_unit():
     # n_model.save(r'D:\全局标定测试\单层NEY模型-111.stl')
     # # endregion
 
-    # region 测试subsample_in_mesh()
-    t_model = STLModel.read_stl(r'D:\全局标定测试\sphere_R5.stl')
-    list_point = subsample_in_mesh(t_model)
-    save(list_point, 'subsample.txt')
+    # # region 测试subsample_in_mesh()
+    # t_model = STLModel.read_stl(r'D:\全局标定测试\sphere_R5.stl')
+    # list_point = subsample_in_mesh(t_model)
+    # save(list_point, 'subsample.txt')
+    # # endregion
+
+    # region 测试distance_from_point_to_plane()
+    t_point = Point3D(2, 2, 2)
+    t_plane = Plane(Point3D(0, 0, 0), Point3D(1, 1, 1))
+    print(distance_from_point_to_plane(t_point, t_plane))
     # endregion
 
     pass
@@ -440,4 +462,4 @@ def simulation_test():
 
 
 if __name__ == '__main__':
-    simulation_test()
+    test_unit()

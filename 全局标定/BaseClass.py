@@ -215,7 +215,7 @@ class Plane:
 
     def __init__(self, xorigin=Point3D(0, 0, 0), xvector=Point3D(0, 0, 1)):
         self.origin = deepcopy(xorigin)
-        self.vector = deepcopy(xvector)
+        self.vector = deepcopy(xvector.to_norm())
 
     def __str__(self):
         return f'origin:{self.origin},vector:{self.vector}'
