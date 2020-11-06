@@ -765,16 +765,16 @@ def test_unit():
     import os
     save_folder = r"D:\全局标定测试"
 
-    # # region 测试point类
-    # m_point = POINT3D(*[0, 2, 0])
-    # print('测试print函数：', m_point)
-    # print('测试点加法：', m_point + POINT3D(1, 1, 1))
-    # print('测试点减法：', m_point - POINT3D(1, 1, 1))
-    # save_point_path = os.path.join(save_folder, 'POINT3D.txt')
-    # m_point.save(save_point_path)
-    # print(f'测试点保存：{save_point_path}')
-    # print('测试点归一化:', m_point.to_norm())
-    # # endregion 测试point类
+    # region 测试point类
+    m_point = Point3D(*[0, 2, 0])
+    print('测试print函数：', m_point)
+    print('测试点加法：', m_point + Point3D(1, 1, 1))
+    print('测试点减法：', m_point - Point3D(1, 1, 1))
+    save_point_path = os.path.join(save_folder, 'POINT3D.txt')
+    m_point.save(save_point_path)
+    print(f'测试点保存：{save_point_path}')
+    print('测试点归一化:', m_point.to_norm())
+    # endregion 测试point类
 
     # # region 测试line类
     # m_line = LINE2D()
@@ -826,12 +826,12 @@ def test_unit():
     # print(f'盒子的范围为：\n{m_box}')
     # # endregion
 
-    # region 测试Coordinate3D类
-    m_coordinate = Coordinate3D()
-    save_point_path = os.path.join(save_folder, 'Coordinate3D.txt')
-    m_coordinate.save(save_point_path)
-    print(m_coordinate)
-    # endregion
+    # # region 测试Coordinate3D类
+    # m_coordinate = Coordinate3D()
+    # save_point_path = os.path.join(save_folder, 'Coordinate3D.txt')
+    # m_coordinate.save(save_point_path)
+    # print(m_coordinate)
+    # # endregion
 
 
 if __name__ == '__main__':

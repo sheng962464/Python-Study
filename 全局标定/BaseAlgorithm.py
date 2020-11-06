@@ -398,12 +398,12 @@ def test_unit():
     # print(new_plane)
     # # endregion
 
-    # # region 叉乘测试
-    # m_point1 = POINT3D(1, 22, 0)
-    # m_point2 = POINT3D(3, 1, 0)
-    # print(cross_multiply(m_point1, m_point2))
-    # print(dot_multiply(m_point1, m_point2))
-    # # endregion
+    # region 叉乘测试
+    m_point1 = Point3D(1, 22, 0)
+    m_point2 = Point3D(3, 1, 0)
+    print(cross_multiply(m_point1, m_point2))
+    print(dot_multiply(m_point1, m_point2))
+    # endregion
 
     # # region 测试get_rotate_matrix_from_two_vector
     # m_vector1 = POINT3D(0, 0, 1)
@@ -446,11 +446,11 @@ def test_unit():
     # save(list_point, 'subsample.txt')
     # # endregion
 
-    # region 测试distance_from_point_to_plane()
-    t_point = Point3D(2, 2, 2)
-    t_plane = Plane(Point3D(0, 0, 0), Point3D(1, 1, 1))
-    print(distance_from_point_to_plane(t_point, t_plane))
-    # endregion
+    # # region 测试distance_from_point_to_plane()
+    # t_point = Point3D(2, 2, 2)
+    # t_plane = Plane(Point3D(0, 0, 0), Point3D(1, 1, 1))
+    # print(distance_from_point_to_plane(t_point, t_plane))
+    # # endregion
 
     pass
 

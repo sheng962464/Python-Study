@@ -91,6 +91,7 @@ def test_unit():
     print('测试-判断是否为旋转矩阵：\n', is_rotate_matrix(test_matrix))
     print('测试-矩阵转为欧拉角\n', matrix_to_euler_angle(test_matrix))
     print('测试-罗德里格斯变换:\n', Rodrigues([-2.100418, -2.167796, 0.273330]))
+    print('测试-罗德里格斯变换:\n', Rodrigues([0, 0, 0]))
 
 
 if __name__ == '__main__':
