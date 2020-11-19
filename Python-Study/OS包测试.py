@@ -1,6 +1,7 @@
 import os
 
 
+# 使用compare软件打开result点云
 def open_file_as(x_software, x_file):
     os.popen(f'"{x_software}" "{x_file}"')
 

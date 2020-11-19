@@ -23,20 +23,19 @@ class Point2D:
         self.__y = xy
 
     def __add__(self, other):
-        assert isinstance(other, Point2D)
         return Point2D(self.__x + other.__x, self.__y + other.__y)
 
     def __sub__(self, other):
-        assert isinstance(other, Point2D)
         return Point2D(self.__x - other.__x, self.__y - other.__y)
 
     def __mul__(self, other):
-        assert isinstance(other, (int, float))
         return Point2D(self.__x * other, self.__y * other)
 
     def __truediv__(self, other):
-        assert isinstance(other, (int, float)) and other
-        return Point2D(self.__x / other, self.__y / other)
+        if other:
+            return Point2D(self.__x / other, self.__y / other)
+        else:
+            return Point2D.nan()
 
     def __str__(self):
         return f'({self.__x:.3f},{self.__y:.3f})'
@@ -66,3 +65,11 @@ class Point2D:
         计算 sqrt(x*x + y*y)
         """
         return float(np.linalg.norm(self.to_array()))
+
+    @staticmethod
+    def nan():
+        return Point2D(float('nan'), float('nan'))
+
+
+if __name__ == '__main__':
+    print(Point2D.nan())

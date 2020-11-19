@@ -57,5 +57,8 @@ def test_is_rotate_matrix():
     print(np.linalg.inv(A))
 
 
+# 矩阵乘法
+# np.matmul()
+
 if __name__ == '__main__':
     test_is_rotate_matrix()
