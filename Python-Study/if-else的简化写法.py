@@ -1,14 +1,14 @@
-def isLen_1(strString):
-    return True if len(strString) > 6 else False
+def is_len_1(mstr):
+    return True if len(mstr) > 6 else False
 
 
-def isLen_2(strString):
-    if len(strString) > 6:
+def is_len_2(mstr):
+    if len(mstr) > 6:
         return True
     else:
         return False
 
 
-def isLen_3(strString):
+def is_len_3(mstr):
     # 这里注意false和true的位置
-    return [False, True][len(strString) > 6]
+    return [False, True][len(mstr) > 6]
