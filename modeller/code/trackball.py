@@ -47,10 +47,10 @@
 # - Pletinckx, D., Quaternion calculus as a basic tool in computer
 #   graphics, The Visual Computer 5, 2-13, 1989.
 # -----------------------------------------------------------------------------
-''' Provides a virtual trackball for 3D scene viewing
+""" Provides a virtual trackball for 3D scene viewing
 
 Example usage:
- 
+
    trackball = Trackball(45,45)
 
    @window.event
@@ -76,7 +76,7 @@ You can also set trackball orientation directly by setting theta and phi value
 expressed in degrees. Theta relates to the rotation angle around X axis while
 phi relates to the rotation angle around Z axis.
 
-'''
+"""
 __docformat__ = 'restructuredtext'
 __version__ = '1.0'
 
@@ -89,8 +89,12 @@ from OpenGL.GL import GLfloat
 # -----------------------------------------------------------------------------
 def _v_add(v1, v2):
     return [v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]]
+
+
 def _v_sub(v1, v2):
     return [v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]]
+
+
 def _v_mul(v, s):
     return [v[0] * s, v[1] * s, v[2] * s]
 
@@ -115,6 +119,7 @@ def _v_normalize(v):
     except ZeroDivisionError:
         return v
 
+
 # Some useful functions on quaternions
 # -----------------------------------------------------------------------------
 def _q_add(q1, q2):
@@ -129,6 +134,8 @@ def _q_add(q1, q2):
 
 def _q_mul(q, s):
     return [q[0] * s, q[1] * s, q[2] * s, q[3] * s]
+
+
 def _q_dot(q1, q2):
     return q1[0] * q2[0] + q1[1] * q2[1] + q1[2] * q2[2] + q1[3] * q2[3]
 
@@ -167,12 +174,11 @@ def _q_rotmatrix(q):
     return m
 
 
-
 class Trackball(object):
-    ''' Virtual trackball for 3D scene viewing. '''
+    """ Virtual trackball for 3D scene viewing. """
 
     def __init__(self, theta=0, phi=0, zoom=1, distance=3):
-        ''' Build a new trackball with specified view '''
+        """ Build a new trackball with specified view """
 
         self._rotation = [0, 0, 0, 1]
         self.zoom = zoom
@@ -186,7 +192,7 @@ class Trackball(object):
         self._y = 0.0
 
     def drag_to(self, x, y, dx, dy):
-        ''' Move trackball view from x,y to x+dx,y+dy. '''
+        """ Move trackball view from x,y to x+dx,y+dy. """
         viewport = gl.glGetIntegerv(gl.GL_VIEWPORT)
         width, height = float(viewport[2]), float(viewport[3])
         x = (x * 2.0 - width) / width
@@ -203,16 +209,15 @@ class Trackball(object):
         self._matrix = (GLfloat * len(m))(*m)
 
     def zoom_to(self, x, y, dx, dy):
-        ''' Zoom trackball by a factor dy '''
+        """ Zoom trackball by a factor dy """
         viewport = gl.glGetIntegerv(gl.GL_VIEWPORT)
         height = float(viewport[3])
         self.zoom = self.zoom - 5 * dy / height
 
     def pan_to(self, x, y, dx, dy):
-        ''' Pan trackball by a factor dx,dy '''
+        """ Pan trackball by a factor dx,dy """
         self.x += dx * 0.1
         self.y += dy * 0.1
-
 
     def push(self):
         viewport = gl.glGetIntegerv(gl.GL_VIEWPORT)
@@ -235,7 +240,7 @@ class Trackball(object):
         gl.glTranslate(self._x, self._y, -self._distance)
         gl.glMultMatrixf(self._matrix)
 
-    def pop(void):
+    def pop(self):
         gl.glMatrixMode(gl.GL_MODELVIEW)
         gl.glPopMatrix()
         gl.glMatrixMode(gl.GL_PROJECTION)
@@ -243,23 +248,31 @@ class Trackball(object):
 
     def _get_matrix(self):
         return self._matrix
+
     matrix = property(_get_matrix,
                       doc='''Model view matrix transformation (read-only)''')
 
     def _get_zoom(self):
         return self._zoom
+
     def _set_zoom(self, zoom):
         self._zoom = zoom
-        if self._zoom < .25: self._zoom = .25
-        if self._zoom > 10: self._zoom = 10
+        if self._zoom < .25:
+            self._zoom = .25
+        if self._zoom > 10:
+            self._zoom = 10
+
     zoom = property(_get_zoom, _set_zoom,
                     doc='''Zoom factor''')
 
     def _get_distance(self):
         return self._distance
+
     def _set_distance(self, distance):
         self._distance = distance
-        if self._distance < 1: self._distance = 1
+        if self._distance < 1:
+            self._distance = 1
+
     distance = property(_get_distance, _set_distance,
                         doc='''Scene distance from point of view''')
 
@@ -270,6 +283,7 @@ class Trackball(object):
     def _set_theta(self, theta):
         self._set_orientation(math.fmod(theta, 360.0),
                               math.fmod(self._phi, 360.0))
+
     theta = property(_get_theta, _set_theta,
                      doc='''Angle (in degrees) around the z axis''')
 
@@ -280,12 +294,12 @@ class Trackball(object):
     def _set_phi(self, phi):
         self._set_orientation(math.fmod(self._theta, 360.),
                               math.fmod(phi, 360.0))
+
     phi = property(_get_phi, _set_phi,
                    doc='''Angle around x axis''')
 
-
     def _get_orientation(self):
-        ''' Return current computed orientation (theta,phi). '''
+        """ Return current computed orientation (theta,phi). """
 
         q0, q1, q2, q3 = self._rotation
         ax = math.atan(2 * (q0 * q1 + q2 * q3) / (1 - 2 * (q1 * q1 + q2 * q2))) * 180.0 / math.pi
@@ -293,7 +307,7 @@ class Trackball(object):
         return -az, ax
 
     def _set_orientation(self, theta, phi):
-        ''' Computes rotation corresponding to theta and phi. '''
+        """ Computes rotation corresponding to theta and phi. """
 
         self._theta = theta
         self._phi = phi
@@ -301,19 +315,19 @@ class Trackball(object):
         sine = math.sin(0.5 * angle)
         xrot = [1 * sine, 0, 0, math.cos(0.5 * angle)]
         angle = self._phi * (math.pi / 180.0)
-        sine = math.sin(0.5 * angle);
+        sine = math.sin(0.5 * angle)
         zrot = [0, 0, sine, math.cos(0.5 * angle)]
         self._rotation = _q_add(xrot, zrot)
         m = _q_rotmatrix(self._rotation)
         self._matrix = (GLfloat * len(m))(*m)
 
     def _project(self, r, x, y):
-        ''' Project an x,y pair onto a sphere of radius r OR a hyperbolic sheet
+        """ Project an x,y pair onto a sphere of radius r OR a hyperbolic sheet
             if we are away from the center of the sphere.
-        '''
+        """
 
         d = math.sqrt(x * x + y * y)
-        if (d < r * 0.70710678118654752440):  # Inside sphere
+        if d < r * 0.70710678118654752440:  # Inside sphere
             z = math.sqrt(r * r - d * d)
         else:  # On hyperbola
             t = r / 1.41421356237309504880
@@ -321,7 +335,7 @@ class Trackball(object):
         return z
 
     def _rotate(self, x, y, dx, dy):
-        ''' Simulate a track-ball.
+        """ Simulate a track-ball.
 
             Project the points onto the virtual trackball, then figure out the
             axis of rotation, which is the cross product of x,y and x+dx,y+dy.
@@ -330,7 +344,7 @@ class Trackball(object):
             center, but is deformed into a hyperbolic sheet of rotation away
             from the center.  This particular function was chosen after trying
             out several variations.
-        '''
+        """
 
         if not dx and not dy:
             return [0.0, 0.0, 0.0, 1.0]
@@ -339,8 +353,10 @@ class Trackball(object):
         a = _v_cross(new, last)
         d = _v_sub(last, new)
         t = _v_length(d) / (2.0 * self._TRACKBALLSIZE)
-        if (t > 1.0): t = 1.0
-        if (t < -1.0): t = -1.0
+        if t > 1.0:
+            t = 1.0
+        if t < -1.0:
+            t = -1.0
         phi = 2.0 * math.asin(t)
         return _q_from_axis_angle(a, phi)
 

@@ -1,6 +1,8 @@
 import numpy
 
+
 def translation(displacement):
+    # 平移
     t = numpy.identity(4)
     t[0, 3] = displacement[0]
     t[1, 3] = displacement[1]
@@ -10,6 +12,7 @@ def translation(displacement):
 
 def scaling(scale):
     s = numpy.identity(4)
+    # 缩放
     s[0, 0] = scale[0]
     s[1, 1] = scale[1]
     s[2, 2] = scale[2]
