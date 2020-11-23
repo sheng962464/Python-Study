@@ -148,7 +148,7 @@ class Viewer(object):
         direction = end - start
         direction = direction / norm(direction)
 
-        return (start, direction)
+        return start, direction
 
     def pick(self, x, y):
         """ Execute pick of an object. Selects an object in the scene. """

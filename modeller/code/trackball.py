@@ -89,12 +89,8 @@ from OpenGL.GL import GLfloat
 # -----------------------------------------------------------------------------
 def _v_add(v1, v2):
     return [v1[0] + v2[0], v1[1] + v2[1], v1[2] + v2[2]]
-
-
 def _v_sub(v1, v2):
     return [v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]]
-
-
 def _v_mul(v, s):
     return [v[0] * s, v[1] * s, v[2] * s]
 
@@ -119,7 +115,6 @@ def _v_normalize(v):
     except ZeroDivisionError:
         return v
 
-
 # Some useful functions on quaternions
 # -----------------------------------------------------------------------------
 def _q_add(q1, q2):
@@ -134,8 +129,6 @@ def _q_add(q1, q2):
 
 def _q_mul(q, s):
     return [q[0] * s, q[1] * s, q[2] * s, q[3] * s]
-
-
 def _q_dot(q1, q2):
     return q1[0] * q2[0] + q1[1] * q2[1] + q1[2] * q2[2] + q1[3] * q2[3]
 
@@ -172,6 +165,7 @@ def _q_rotmatrix(q):
     m[2 * 4 + 2] = 1.0 - 2.0 * (q[1] * q[1] + q[0] * q[0])
     m[3 * 4 + 3] = 1.0
     return m
+
 
 
 class Trackball(object):
@@ -219,6 +213,7 @@ class Trackball(object):
         self.x += dx * 0.1
         self.y += dy * 0.1
 
+
     def push(self):
         viewport = gl.glGetIntegerv(gl.GL_VIEWPORT)
         gl.glMatrixMode(gl.GL_PROJECTION)
@@ -248,28 +243,23 @@ class Trackball(object):
 
     def _get_matrix(self):
         return self._matrix
-
     matrix = property(_get_matrix,
                       doc='''Model view matrix transformation (read-only)''')
 
     def _get_zoom(self):
         return self._zoom
-
     def _set_zoom(self, zoom):
         self._zoom = zoom
         if self._zoom < .25: self._zoom = .25
         if self._zoom > 10: self._zoom = 10
-
     zoom = property(_get_zoom, _set_zoom,
                     doc='''Zoom factor''')
 
     def _get_distance(self):
         return self._distance
-
     def _set_distance(self, distance):
         self._distance = distance
         if self._distance < 1: self._distance = 1
-
     distance = property(_get_distance, _set_distance,
                         doc='''Scene distance from point of view''')
 
@@ -280,7 +270,6 @@ class Trackball(object):
     def _set_theta(self, theta):
         self._set_orientation(math.fmod(theta, 360.0),
                               math.fmod(self._phi, 360.0))
-
     theta = property(_get_theta, _set_theta,
                      doc='''Angle (in degrees) around the z axis''')
 
@@ -291,9 +280,9 @@ class Trackball(object):
     def _set_phi(self, phi):
         self._set_orientation(math.fmod(self._theta, 360.),
                               math.fmod(phi, 360.0))
-
     phi = property(_get_phi, _set_phi,
                    doc='''Angle around x axis''')
+
 
     def _get_orientation(self):
         ''' Return current computed orientation (theta,phi). '''

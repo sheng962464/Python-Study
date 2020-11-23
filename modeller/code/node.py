@@ -11,7 +11,6 @@ import color
 
 class Node(object):
     """ Base class for scene elements """
-
     def __init__(self):
         self.color_index = random.randint(color.MIN_COLOR, color.MAX_COLOR)
         self.aabb = AABB([0.0, 0.0, 0.0], [0.5, 0.5, 0.5])
@@ -69,7 +68,6 @@ class Node(object):
         else:
             self.selected = not self.selected
 
-
 class Primitive(Node):
     def __init__(self):
         super(Primitive, self).__init__()
@@ -81,7 +79,6 @@ class Primitive(Node):
 
 class Sphere(Primitive):
     """ Sphere primitive """
-
     def __init__(self):
         super(Sphere, self).__init__()
         self.call_list = G_OBJ_SPHERE
@@ -89,7 +86,6 @@ class Sphere(Primitive):
 
 class Cube(Primitive):
     """ Cube primitive """
-
     def __init__(self):
         super(Cube, self).__init__()
         self.call_list = G_OBJ_CUBE

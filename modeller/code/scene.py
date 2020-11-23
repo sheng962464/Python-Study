@@ -4,6 +4,7 @@ from node import Sphere, Cube, SnowFigure
 
 
 class Scene(object):
+
     # the default depth from the camera to place an object at
     PLACE_DEPTH = 15.0
 
