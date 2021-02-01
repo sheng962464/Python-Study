@@ -1,64 +1,47 @@
-from BaseClass import *
-import numpy as np
 import sys
 
-epsilon1 = 1e-1
-epsilon2 = 1e-2
-epsilon3 = 1e-3
-epsilon5 = 1e-5
-epsilon8 = 1e-8
+from Geometry3D import *
 
 
-def cross_multiply(x_point1, x_point2):
+def cross_multiply(vec1: Vector3D, vec2: Vector3D) -> Vector3D:
     """
     | i j k |
 　　|a1 b1 c1|
 　　|a2 b2 c2|
 　　=(b1c2 - b2c1, c1a2 - a1c2, a1b2 - a2b1)
-    在三维几何中，
-    向量a和向量b的叉乘结果是一个向量，更为熟知的叫法是法向量，该向量垂直于a和b向量构成的平面
+    在三维几何中，向量a和向量b的叉乘结果是一个向量，更为熟知的叫法是法向量，该向量垂直于a和b向量构成的平面
     """
-    assert isinstance(x_point1, Point3D) and isinstance(x_point2, Point3D)
-    a1, b1, c1 = x_point1.to_array()
-    a2, b2, c2 = x_point2.to_array()
-    return Point3D(b1 * c2 - b2 * c1, c1 * a2 - a1 * c2, a1 * b2 - a2 * b1).to_norm()
+    return Vector3D(*np.cross(vec1.to_array(), vec2.to_array()))
 
 
-def cross_multiply_2d(x_point1, x_point2):
+def cross_multiply_2d(vec1: Vector2D, vec2: Vector2D) -> float:
     """
-    | i j k |
-　　|a1 b1 c1|
-　　|a2 b2 c2|
-　　=(b1c2 - b2c1, c1a2 - a1c2, a1b2 - a2b1)
-    在三维几何中，
-    向量a和向量b的叉乘结果是一个向量，更为熟知的叫法是法向量，该向量垂直于a和b向量构成的平面
+    二维向量的叉乘表示平行四边形围成的面积
     """
-    assert isinstance(x_point1, Point2D) and isinstance(x_point2, Point2D)
-    x1, y1 = x_point1.to_array()
-    x2, y2 = x_point2.to_array()
+    x1, y1 = vec1.to_array()
+    x2, y2 = vec2.to_array()
     return x1 * y2 - x2 * y1
 
 
-def dot_multiply(x_point1, x_point2):
+def dot_multiply(vec1: Vector3D, vec2: Vector3D):
     """
     (a1,b1,c1) * (a2,b2,c2) = a1a2 + b1b2 + c1c2
     点乘的几何意义是可以用来表征或计算两个向量之间的夹角,以及在b向量在a向量方向上的投影
     dot(x,y) = |x| * |y| * cos
     """
-    assert isinstance(x_point1, Point3D) and isinstance(x_point2, Point3D)
-    return np.dot(x_point1.to_array(), x_point2.to_array())
+    return np.dot(vec1.to_array(), vec2.to_array())
 
 
-def intersection_of_line_and_plane(xline, xplane):
+def intersection_of_line_and_plane(xline: Line3D, xplane: Plane):
     """
     计算直线与面的交点
     t = ((n1–m1)*vp1 + (n2–m2)*vp2 + (n3–m3)*vp3) / (vp1*v1+ vp2*v2+ vp3*v3)
     (可以优化为向量的叉乘)
     """
     assert isinstance(xline, Line3D) and isinstance(xplane, Plane)
-    if dot_multiply(xline.direction, xplane.vector):
-        temp = dot_multiply((xplane.origin - xline.origin), xplane.vector) / dot_multiply(xline.direction,
-                                                                                          xplane.vector)
+    if dot_multiply(xline.direction(), xplane.vector):
+        temp = dot_multiply((xplane.origin - xline.begin), xplane.vector) / dot_multiply(xline.direction(),
+                                                                                         xplane.vector)
         return xline.get_point_from_t(temp)
     else:
         return None
@@ -300,7 +283,8 @@ def intersection_of_sensor_laser_and_model(x_sensor: Sensor, x_model: STLModel):
     triangle_slice_count = len(x_model)
     # 计算所有的激光的起始点
     x_laser_origin = temp_laser_origin()
-    temp_x = [x_index * 0.01 for x_index in range(int(x_laser_origin[0][0][0] * 100), int(x_laser_origin[0][-1][0] * 100))]
+    temp_x = [x_index * 0.01 for x_index in
+              range(int(x_laser_origin[0][0][0] * 100), int(x_laser_origin[0][-1][0] * 100))]
     temp_y = [y_index * 0.1 for y_index in range(int(x_laser_origin[0][0][1] * 10), int(x_laser_origin[-1][0][1] * 10))]
 
     for x_triangle_index, x_triangle in enumerate(x_model):
